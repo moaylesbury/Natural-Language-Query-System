@@ -16,17 +16,73 @@ def add(lst,item):
 
 class Lexicon:
     """stores known word stems of various part-of-speech categories"""
-    # add code here
+
+    def __int__(self):
+        self.lb = []   # LexBase
+
+    def add(self, stem, cat):
+        if (cat in "PAINT"):
+            if ((stem, cat) not in self.lb):
+                self.lb.insert((stem, cat))
+            else:
+                print((stem, cat) + " already in lex base")
+        else:
+            print(cat + " is not one of the valid POS categories: P, A, I, N or T")
+
+    def getAll(self, cat):
+        return [f for f in self.lb if f[1] == cat]
+
+
 
 class FactBase:
     """stores unary and binary relational facts"""
-    # add code here
+
+    def __init__(self):
+        self.fb = []   # FactBase
+
+    def addUnary(self, pred, e1):
+        if ((pred, e1) not in self.fb):
+            self.fb.insert((pred, e1))
+        else:
+            print((pred, e1) + " already in fact base")
+
+    def addBinary(self, pred, e1, e2):
+        if ((pred, e1, e2) not in self.fb):
+            self.fb.insert((pred, e1, e2))
+        else:
+            print((pred, e1, e2) + " already in fact base")
+
+    def queryUnary(self, pred, e1):
+        return True if ((pred, e1) in self.fb) else False
+
+    def queryBinary(self, pred, e1, e2):
+        return True if ((pred, e1, e2) in self.fb) else False
 
 import re
 from nltk.corpus import brown 
 def verb_stem(s):
     """extracts the stem from the 3sg form of a verb, or returns empty string"""
-    # add code here
+    #ends in s,x,y,z,ch,sh -> add s
+    if (s[-1] in "sxyzh"):
+        if (s[-1] == 'h'):
+            if (s[-2] in "cs"):
+                s += 's'
+        else:
+            s += 's'
+    #ends in y preceeded by a vowel -> add s
+    if (s[-1] == 'y' and s[-2] in "aeiou"):
+        s += 's'
+    #ends in y preceeded by a non vowel and contains at least three letters -> change y to ies
+    if (s[-1] == 'y' and s[-2] not in "aeiou" and len(s) > 2):
+        s[-1] = 'i'
+        s += 'es'
+    #form Xie where x is a letter not a vowel -> add s
+    if (len(s) == 3 and s[0] not in "aeiou" and s[1] == 'i' and s[2] == 'e'):
+        s += 's'
+    #ends in o,x,ch,sh,ss,zz -> add es
+    #ends in se or ze but not sse or zze -> add s
+    #have -> has
+    #ends in e not preceeded by i,o,s,x,z,ch,sh -> add s
 
 def add_proper_name (w,lx):
     """adds a name to a lexicon, checking if first letter is uppercase"""
