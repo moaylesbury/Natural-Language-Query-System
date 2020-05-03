@@ -26,15 +26,17 @@ class Lexicon:
 
     def add(self, stem, cat):
         if (cat in "PAINT"):
-            if ((stem, cat) not in self.lb):
-                self.lb.insert((stem, cat))
-            else:
-                print("(" + stem + ", " + cat + ")" + " already in lex base")
+            add(self.lb, [stem, cat])
         else:
             print(cat + " is not one of the valid POS categories: P, A, I, N or T")
+            return ''
 
     def getAll(self, cat):
-        return [f for f in self.lb if f[1] == cat]
+        if (cat in "PAINT"):
+            return [f for f in self.lb if f[1] == cat]
+        else:
+            print(cat + " is not one of the valid POS categories: P, A, I, N or T")
+            return ''
 
 
 class FactBase:
@@ -44,55 +46,48 @@ class FactBase:
         self.fb = []   # FactBase
 
     def addUnary(self, pred, e1):
-        if ((pred, e1) not in self.fb):
-            self.fb.insert((pred, e1))
-        else:
-            print("(" + pred + ", " + e1 + ")" + " already in fact base")
+        add(self.fb, [pred, e1])
 
     def addBinary(self, pred, e1, e2):
-        if ((pred, e1, e2) not in self.fb):
-            self.fb.insert((pred, e1, e2))
-        else:
-            print("(" + pred + ", " + e1 + ", " + e2 + ")" + " already in fact base")
+        add(self.fb, [pred, e1, e2])
 
     def queryUnary(self, pred, e1):
-        return True if ((pred, e1) in self.fb) else False
+        return True if ([pred, e1] in self.fb) else False
 
     def queryBinary(self, pred, e1, e2):
-        return True if ((pred, e1, e2) in self.fb) else False
+        return True if ([pred, e1, e2] in self.fb) else False
 
 
 def verb_stem(s):
     """extracts the stem from the 3sg form of a verb, or returns empty string"""
 
-    if (re.match('.*[^aeiousxyz(ch)(sh)]$', s)):                  # ends in s,x,y,z,ch,sh -> add s
-        s += 's'
+    if (re.match('.+[^aeiousxyz(ch)(sh)]$', s)):                  # ends in s,x,y,z,ch,sh -> add s
+        s += "s"
         return s
     elif (re.match('.*[aeiou]y$', s)):                             # ends in y preceded by a vowel -> add s
-        s += 's'
+        s += "s"
         return s
     elif (re.match('.+[^aeiou]y$', s)):              # ends in y preceeded by a non vowel and contains at least three letters -> change y to ies
-        s[-1] = 'i'
-        s += "es"
+        s = s[:-1] + "ies"
         return s
     elif (re.match('[^aeiou]ie$', s)):                            # form Xie where x is a letter not a vowel -> add s
-        s += 's'
+        s += "s"
         return s
-    elif (re.match('.+[ox]*(?<=(ch|sh|ss|zz))*$', s)):                           # ends in o,x,ch,sh,ss,zz -> add es
+    elif (re.match('.+([ox]|(?<=(ch|sh|ss|zz)))$', s)):                           # ends in o,x,ch,sh,ss,zz -> add es     wrong
         s += "es"
         return s
-    elif (re.match('.+([^s]se|[^z]ze)$', s)):                        # ends in se or ze but not sse or zze -> add s
-        s += 's'
+    elif (re.match('.+([^s]se|[^z]ze)$', s)):                        # ends in se or ze but not sse or zze -> add s       right
+        s += "s"
         return s
     elif (re.match('have', s)):                                 # have -> has
-        s[-2] = 's'
+        s[-2] = "s"
         s = s[:-2]
         return s
     elif (re.match('.*[^iosxz](?<!(ch|sh))e$', s)):                                     # ends in e not preceeded by i,o,s,x,z,ch,sh -> add s
-        s += 's'
+        s += "s"
         return s
     else:
-        return ''
+        return ""
 
 
 def add_proper_name(w, lx):
@@ -111,26 +106,49 @@ def process_statement(lx, wlist, fb):
     #   S  -> P is AR Ns | P is A | P Is | P Ts P
     #   AR -> a | an
     # We parse this in an ad hoc way.
-    msg = add_proper_name (wlist[0],lx)
+    msg = add_proper_name(wlist[0], lx)
     if (msg == ''):
         if (wlist[1] == 'is'):
             if (wlist[2] in ['a', 'an']):
-                lx.add(wlist[3],'N')
-                fb.addUnary('N_'+wlist[3],wlist[0])
+                lx.add(wlist[3], 'N')
+                fb.addUnary('N_'+wlist[3], wlist[0])
             else:
                 lx.add(wlist[2],'A')
-                fb.addUnary('A_'+wlist[2],wlist[0])
+                fb.addUnary('A_'+wlist[2], wlist[0])
         else:
             stem = verb_stem(wlist[1])
             if (len(wlist) == 2):
                 lx.add(stem, 'I')
                 fb.addUnary('I_'+stem, wlist[0])
             else:
-                msg = add_proper_name(wlist[2],lx)
+                msg = add_proper_name(wlist[2], lx)
                 if (msg == ''):
                     lx.add(stem, 'T')
                     fb.addBinary('T_'+stem, wlist[0], wlist[2])
     return msg
 
 # End of PART A.
+
+
+# Testing
+
+if __name__ == "__main__":
+    print("========Testing========")
+    # lx = Lexicon()
+    # lx.add("John", "P")
+    # lx.add("Mary", "P")
+    # lx.add("like", "T")
+    # lx.add("fly", "I")
+    # lx.add("fly", "N")
+    # print(lx.getAll("P"))
+
+    # fb = FactBase()
+    # fb.addUnary("duck", "John")
+    # fb.addBinary("love", "John", "Mary")
+    # print(fb.queryUnary("duck", "John"))           # True
+    # print(fb.queryBinary("love", "Mary", "John"))  # False
+
+    threesgverbs = ["eat", "tell", "show", "pay", "buy", "fly", "try", "unify", "die", "lie", "tie", "go", "box", "attach", "wash", "dress", "fizz", "lose", "daze", "lapse", "analyse"]
+    [print(verb_stem(s)) for s in threesgverbs]
+    print("=======================")
 
