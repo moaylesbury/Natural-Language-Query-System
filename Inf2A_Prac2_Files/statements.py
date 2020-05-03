@@ -61,30 +61,26 @@ class FactBase:
 def verb_stem(s):
     """extracts the stem from the 3sg form of a verb, or returns empty string"""
 
-    if (re.match('.+[^aeiousxyz(ch)(sh)]$', s)):                  # ends in s,x,y,z,ch,sh -> add s
+    # ends in s,x,y,z,ch,sh -> add s
+    # ends in y preceded by a vowel -> add s
+    # form Xie where x is a letter not a vowel -> add s
+    # ends in se or ze but not sse or zze -> add s
+    # ends in e not preceeded by i,o,s,x,z,ch,sh -> add s
+    if (re.match('(.+([^aeiousxyz(ch)(sh)]|[aeiou]y|([^s]se|[^z]ze)|[^iosxz](?<!(ch|sh))e)$)|[^aeiou]ie$', s)):
         s += "s"
         return s
-    elif (re.match('.*[aeiou]y$', s)):                             # ends in y preceded by a vowel -> add s
-        s += "s"
-        return s
-    elif (re.match('.+[^aeiou]y$', s)):              # ends in y preceeded by a non vowel and contains at least three letters -> change y to ies
+    # ends in y preceeded by a non vowel and contains at least three letters -> change y to ies
+    elif (re.match('.+[^aeiou]y$', s)):
         s = s[:-1] + "ies"
         return s
-    elif (re.match('[^aeiou]ie$', s)):                            # form Xie where x is a letter not a vowel -> add s
-        s += "s"
-        return s
-    elif (re.match('.+([ox]|(?<=(ch|sh|ss|zz)))$', s)):                           # ends in o,x,ch,sh,ss,zz -> add es     wrong
+    # ends in o,x,ch,sh,ss,zz -> add es
+    elif (re.match('.+([ox]|(?<=(ch|sh|ss|zz)))$', s)):
         s += "es"
         return s
-    elif (re.match('.+([^s]se|[^z]ze)$', s)):                        # ends in se or ze but not sse or zze -> add s       right
-        s += "s"
-        return s
-    elif (re.match('have', s)):                                 # have -> has
+    # have -> has
+    elif (re.match('have', s)):
         s[-2] = "s"
         s = s[:-2]
-        return s
-    elif (re.match('.*[^iosxz](?<!(ch|sh))e$', s)):                                     # ends in e not preceeded by i,o,s,x,z,ch,sh -> add s
-        s += "s"
         return s
     else:
         return ""
