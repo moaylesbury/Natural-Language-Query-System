@@ -62,27 +62,22 @@ import re
 from nltk.corpus import brown 
 def verb_stem(s):
     """extracts the stem from the 3sg form of a verb, or returns empty string"""
-    #ends in s,x,y,z,ch,sh -> add s
-    if (s[-1] in "sxyzh"):
-        if (s[-1] == 'h'):
-            if (s[-2] in "cs"):
-                s += 's'
-        else:
-            s += 's'
-    #ends in y preceeded by a vowel -> add s
-    if (s[-1] == 'y' and s[-2] in "aeiou"):
+
+    if (re.match('.*[^aeiousxyz(ch)(sh)]$', s)):                  # ends in s,x,y,z,ch,sh -> add s
         s += 's'
-    #ends in y preceeded by a non vowel and contains at least three letters -> change y to ies
-    if (s[-1] == 'y' and s[-2] not in "aeiou" and len(s) > 2):
+    elif (re.match('.*[aeiou]y', s)):                             # ends in y preceeded by a vowel -> add s
+        s += 's'
+    elif (re.match('.+[^aeiou]y', s)):              # ends in y preceeded by a non vowel and contains at least three letters -> change y to ies
         s[-1] = 'i'
         s += 'es'
-    #form Xie where x is a letter not a vowel -> add s
-    if (len(s) == 3 and s[0] not in "aeiou" and s[1] == 'i' and s[2] == 'e'):
+    elif (re.match('[^aeiou]ie', s)):                            # form Xie where x is a letter not a vowel -> add s
         s += 's'
-    #ends in o,x,ch,sh,ss,zz -> add es
-    #ends in se or ze but not sse or zze -> add s
-    #have -> has
-    #ends in e not preceeded by i,o,s,x,z,ch,sh -> add s
+    elif (re.match('.*[ox]|.*(ch|sh|ss|zz)', s)):                           # ends in o,x,ch,sh,ss,zz -> add es
+    elif (re.match('.*[^s]se|.*[^z]ze', s)):                        # ends in se or ze but not sse or zze -> add s
+    elif (re.match('have', s)):                                 # have -> has
+    elif (re.match('', s)):                                     # ends in e not preceeded by i,o,s,x,z,ch,sh -> add s
+    else:
+        return None
 
 def add_proper_name (w,lx):
     """adds a name to a lexicon, checking if first letter is uppercase"""
