@@ -61,27 +61,22 @@ class FactBase:
 def verb_stem(s):
     """extracts the stem from the 3sg form of a verb, or returns empty string"""
 
+    # have -> has
+    if (re.match('have', s)):
+        return "has"
     # ends in s,x,y,z,ch,sh -> add s
     # ends in y preceded by a vowel -> add s
     # form Xie where x is a letter not a vowel -> add s
     # ends in se or ze but not sse or zze -> add s
     # ends in e not preceeded by i,o,s,x,z,ch,sh -> add s
-    if (re.match('(.+([^aeiousxyz(ch)(sh)]|[aeiou]y|([^s]se|[^z]ze)|[^iosxz](?<!(ch|sh))e)$)|[^aeiou]ie$', s)):
-        s += "s"
-        return s
+    elif (re.match('(.+([^aeiousxyz(ch)(sh)]|[aeiou]y|([^s]se|[^z]ze)|[^iosxz](?<!(ch|sh))e)$)|[^aeiou]ie$', s)):
+        return s + "s"
     # ends in y preceeded by a non vowel and contains at least three letters -> change y to ies
     elif (re.match('.+[^aeiou]y$', s)):
-        s = s[:-1] + "ies"
-        return s
+        return s[:-1] + "ies"
     # ends in o,x,ch,sh,ss,zz -> add es
     elif (re.match('.+([ox]|(?<=(ch|sh|ss|zz)))$', s)):
-        s += "es"
-        return s
-    # have -> has
-    elif (re.match('have', s)):
-        s[-2] = "s"
-        s = s[:-2]
-        return s
+        return s + "es"
     else:
         return ""
 
@@ -144,7 +139,7 @@ if __name__ == "__main__":
     # print(fb.queryUnary("duck", "John"))           # True
     # print(fb.queryBinary("love", "Mary", "John"))  # False
 
-    threesgverbs = ["eat", "tell", "show", "pay", "buy", "fly", "try", "unify", "die", "lie", "tie", "go", "box", "attach", "wash", "dress", "fizz", "lose", "daze", "lapse", "analyse"]
+    threesgverbs = ["eat", "tell", "show", "pay", "buy", "fly", "try", "unify", "die", "lie", "tie", "go", "box", "attach", "wash", "dress", "fizz", "lose", "daze", "lapse", "analyse", "have"]
     [print(verb_stem(s)) for s in threesgverbs]
     print("=======================")
 
