@@ -24,15 +24,48 @@ function_words_tags = [('a','AR'), ('an','AR'), ('and','AND'),
 function_words = [p[0] for p in function_words_tags]
 
 def unchanging_plurals():
+    # holds unchanging plurals
+    u_p = []
     with open("sentences.txt", "r") as f:
         for line in f:
-            # add code here
+            # splits into word|tag
+            for wordtag in line.split():
+                # splits into word and tag
+                word, tag0 = wordtag.split('|')
+                # removes dollar sign from the end of tags where a new line would be
+                tag = remove_new_line_char(tag0)
+                # only dealing with nouns
+                if tag == "NNS" or tag == "NN":
+                    # according to the give rules if verb_stem returns the empty string, s is unchanging
+                    if verb_stem(word) == word:
+                        u_p.append([word, tag])
+    print(verb_stem("dogs"))
+    print(u_p)
+
+
+
+
+
+
+
+def remove_new_line_char(tag):
+    return tag[:-2] if tag[-1] == "$" else tag
 
 unchanging_plurals_list = unchanging_plurals()
 
-def noun_stem (s):
+
+def noun_stem(s):
     """extracts the stem from a plural noun, or returns empty string"""    
-    # add code here
+    # if noun stem ends in man, plural replaces with men
+    if (re.match('.*man$', s)):
+        s[-2] = "e"
+        return s
+    # otherwise use rules for 3s formation
+    else:
+        # if verb_stem(s) returns the empty string then s must be an unchanging plural
+        return verb_stem(s) if verb_stem(s) != "" else ""
+
+
 
 def tag_word (lx,wd):
     """returns a list of all possible tags for wd relative to lx"""
