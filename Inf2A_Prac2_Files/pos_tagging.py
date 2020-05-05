@@ -24,10 +24,13 @@ function_words_tags = [('a','AR'), ('an','AR'), ('and','AND'),
 function_words = [p[0] for p in function_words_tags]
 
 def unchanging_plurals():
-    # holds unchanging plurals
+    # list to hold unchanging plurals
     u_p = []
+    # dictionary to hold key : value = word : tag, where tag is NN or NNS
     nn_s = {}
+    # opens corpus
     with open("sentences.txt", "r") as f:
+        # loops through each line of the corpus
         for line in f:
             # splits into word|tag
             for wordtag in line.split():
@@ -37,13 +40,18 @@ def unchanging_plurals():
                 tag = remove_new_line_char(tag0)
                 # only dealing with nouns
                 if tag == "NN" or tag == "NNS":
+                    # if the word is in the key set then the word has been added as NN or NNS
                     if word in nn_s.keys():
+                        # if the word's tag is not equal to the current tag then the word can have both NN and NNS tags
+                        # thus is an unchanging plural
                         if nn_s.get(word) != tag:
+                            # check the word hasn't already been identified as an unchanging plural
                             if word not in u_p:
                                 u_p.append(word)
                     else:
+                        # if the word isn't in the key set, it needs to be added to the dictionary
                         nn_s[word] = tag
-    print(u_p)
+    return u_p
 
 def remove_new_line_char(tag):
     return tag[:-2] if tag[-1] == "$" else tag
@@ -52,15 +60,17 @@ unchanging_plurals_list = unchanging_plurals()
 
 
 def noun_stem(s):
-    """extracts the stem from a plural noun, or returns empty string"""    
+    """extracts the stem from a plural noun, or returns empty string"""
+    # if noun is unchanging plural, return the empty string
+    if s in unchanging_plurals_list:
+        return ""
     # if noun stem ends in man, plural replaces with men
-    if (re.match('.*man$', s)):
+    elif (re.match('.*man$', s)):
         s[-2] = "e"
         return s
     # otherwise use rules for 3s formation
     else:
-        # if verb_stem(s) returns the empty string then s must be an unchanging plural
-        return verb_stem(s) if verb_stem(s) != "" else ""
+        return verb_stem(s)
 
 
 
