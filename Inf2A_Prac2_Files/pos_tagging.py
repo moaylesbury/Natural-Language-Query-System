@@ -26,6 +26,7 @@ function_words = [p[0] for p in function_words_tags]
 def unchanging_plurals():
     # holds unchanging plurals
     u_p = []
+    nn_s = {}
     with open("sentences.txt", "r") as f:
         for line in f:
             # splits into word|tag
@@ -35,18 +36,14 @@ def unchanging_plurals():
                 # removes dollar sign from the end of tags where a new line would be
                 tag = remove_new_line_char(tag0)
                 # only dealing with nouns
-                if tag == "NNS" or tag == "NN":
-                    # according to the give rules if verb_stem returns the empty string, s is unchanging
-                    if verb_stem(word) == word:
-                        u_p.append([word, tag])
-    print(verb_stem("dogs"))
+                if tag == "NN" or tag == "NNS":
+                    if word in nn_s.keys():
+                        if nn_s.get(word) != tag:
+                            if word not in u_p:
+                                u_p.append(word)
+                    else:
+                        nn_s[word] = tag
     print(u_p)
-
-
-
-
-
-
 
 def remove_new_line_char(tag):
     return tag[:-2] if tag[-1] == "$" else tag
