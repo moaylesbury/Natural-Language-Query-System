@@ -23,6 +23,7 @@ function_words_tags = [('a','AR'), ('an','AR'), ('and','AND'),
 
 function_words = [p[0] for p in function_words_tags]
 
+
 def unchanging_plurals():
     # list to hold unchanging plurals
     u_p = []
@@ -53,8 +54,10 @@ def unchanging_plurals():
                         nn_s[word] = tag
     return u_p
 
+
 def remove_new_line_char(tag):
     return tag[:-2] if tag[-1] == "$" else tag
+
 
 unchanging_plurals_list = unchanging_plurals()
 
@@ -73,18 +76,62 @@ def noun_stem(s):
         return verb_stem(s)
 
 
-
-def tag_word (lx,wd):
+def tag_word(lx, wd):
     """returns a list of all possible tags for wd relative to lx"""
-    # add code here
+    tags = []
 
-def tag_words (lx, wds):
+    for i in function_words_tags:
+        if wd == i[0]:
+            tags.append(i[1])
+
+    for i in "PAINT":
+        returned = lx.getAll(i)
+        # print(returned)
+        if (len(returned) != 0):
+            for j in returned:
+                if j[0] == wd:
+
+                    if j[1] not in tags:
+                        tags.append(j[1])
+                    if j[1] == "N":
+                        if noun_stem(wd) == "":
+                            if j[1] not in tags:
+                                tags.append(j[1] + "s")
+                        else:
+                            if j[1] not in tags:
+                                tags.append(j[1] + "p")
+                    if j[1] in "IT":
+                        if verb_stem(wd) == "":
+                            if j[1] not in tags:
+                                tags.append(j[1] + "s")
+                        else:
+                            if j[1] not in tags:
+                                tags.append(j[1] + "p")
+                    if j[1] in "PA":
+                        if j[1] not in tags:
+                            tags.append(j[1])
+    return tags
+        
+
+def tag_words(lx, wds):
     """returns a list of all possible taggings for a list of words"""
     if (wds == []):
         return [[]]
     else:
-        tag_first = tag_word (lx, wds[0])
-        tag_rest = tag_words (lx, wds[1:])
+        tag_first = tag_word(lx, wds[0])
+        tag_rest = tag_words(lx, wds[1:])
         return [[fst] + rst for fst in tag_first for rst in tag_rest]
+
+# Some testing
+# print("TESTING")
+# lx = Lexicon()
+# lx.add("John", "P")
+# lx.add("Mary", "P")
+# lx.add("like", "T")
+# lx.add("fly", "I")
+# lx.add("fly", "N")
+# wd = "John"
+
+# print(tag_word(lx, "John"))
 
 # End of PART B.
