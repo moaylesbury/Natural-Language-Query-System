@@ -1,5 +1,7 @@
 import re
+import nltk
 from nltk.corpus import brown
+
 
 # File: statements.py
 # Template file for Informatics 2A Assignment 2:
@@ -27,16 +29,10 @@ class Lexicon:
     def add(self, stem, cat):
         if (cat in "PAINT"):
             add(self.lb, [stem, cat])
-        else:
-            print(cat + " is not one of the valid POS categories: P, A, I, N or T")
-            return ''
 
     def getAll(self, cat):
         if (cat in "PAINT"):
             return [f for f in self.lb if f[1] == cat]
-        else:
-            print(cat + " is not one of the valid POS categories: P, A, I, N or T")
-            return ''
 
 
 class FactBase:
@@ -60,9 +56,16 @@ class FactBase:
 
 def verb_stem(s):
     """extracts the stem from the 3sg form of a verb, or returns empty string"""
+    #nltk.download('brown')
+
+    #
+    verbstem = s
+
+    # Finding verb stem
 
     # have -> has
     if (re.match('have', s)):
+        #return "has"
         return "has"
     # ends in s,x,y,z,ch,sh -> add s
     # ends in y preceded by a vowel -> add s
@@ -70,15 +73,44 @@ def verb_stem(s):
     # ends in se or ze but not sse or zze -> add s
     # ends in e not preceeded by i,o,s,x,z,ch,sh -> add s
     elif (re.match('(.+([^aeiousxyz(ch)(sh)]|[aeiou]y|([^s]se|[^z]ze)|[^iosxz](?<!(ch|sh))e)$)|[^aeiou]ie$', s)):
-        return s + "s"
+        #return s + "s"
+        verbstem += "s"
     # ends in y preceeded by a non vowel and contains at least three letters -> change y to ies
     elif (re.match('.+[^aeiou]y$', s)):
-        return s[:-1] + "ies"
+        #return s[:-1] + "ies"
+        verbstem = verbstem[:-1] + "ies"
     # ends in o,x,ch,sh,ss,zz -> add es
     elif (re.match('.+([ox]|(?<=(ch|sh|ss|zz)))$', s)):
-        return s + "es"
+        #return s + "es"
+        verbstem += "es"
     else:
         return ""
+
+    # Checking with the corpus
+
+    print("3s form: ", s, " Verbstem: ", verbstem)
+
+    stags, vstags = 0, 0
+
+
+    for m in brown.tagged_words():
+        if m[0] == s:
+            if m[1] == "VB":
+                stags += 1
+        elif m[0] == verbstem:
+            if m[1] == "VBZ":
+                vstags += 1
+
+    print("stags ", stags, " vstags: ", vstags)
+
+    if stags == vstags == 0:
+        return ""
+
+    if stags + vstags > 0:
+        return verbstem
+
+    # verb stem tagged VB and 3s form VBZ
+
 
 
 def add_proper_name(w, lx):
@@ -123,8 +155,8 @@ def process_statement(lx, wlist, fb):
 
 # Testing
 
-if __name__ == "__main__":
-    print("========Testing========")
+#if __name__ == "__main__":
+  #  print("========Testing========")
     # lx = Lexicon()
     # lx.add("John", "P")
     # lx.add("Mary", "P")
@@ -139,7 +171,7 @@ if __name__ == "__main__":
     # print(fb.queryUnary("duck", "John"))           # True
     # print(fb.queryBinary("love", "Mary", "John"))  # False
 
-    threesgverbs = ["eat", "tell", "show", "pay", "buy", "fly", "try", "unify", "die", "lie", "tie", "go", "box", "attach", "wash", "dress", "fizz", "lose", "daze", "lapse", "analyse", "have"]
-    [print(verb_stem(s)) for s in threesgverbs]
-    print("=======================")
+   # threesgverbs = ["eat", "tell", "show", "pay", "buy", "fly", "try", "unify", "die", "lie", "tie", "go", "box", "attach", "wash", "dress", "fizz", "lose", "daze", "lapse", "analyse", "have"]
+    ##[print(verb_stem(s)) for s in threesgverbs]
+    #sprint("=======================")
 

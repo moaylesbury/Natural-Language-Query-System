@@ -43,11 +43,25 @@ grammar = CFG.fromstring('''
 
 chartpsr = parse.ChartParser(grammar)
 
-def all_parses(wlist,lx):
+
+def all_parses(wlist, lx):
     """returns all possible parse trees for all possible taggings of wlist"""
+    print("called")
     allp = []
+    print(tag_words(lx, wlist))
     for tagging in tag_words(lx, wlist):
+        print("reaches the for loop")
+        print("tagging: ", tagging)
+        #Testing
+        ########
+        print("looping allp")
         allp = allp + [t for t in chartpsr.parse(tagging)]
+        print("allp length: ", len(allp))
+        for a in allp:
+            tr = Tree(a)
+            print("Drawing")
+            tr.draw()
+        print("Successful?")
     return allp
 
 # This produces parse trees of type Tree.
@@ -87,11 +101,15 @@ def top_level_rule(tr):
         
 def N_phrase_num(tr):
     """returns the number attribute of a noun-like tree, based on its head noun"""
+    print("test")
     if (tr.label() == 'N'):
         return tr[0][1]  # the s or p from Ns or Np
     elif (tr.label() == 'Nom'):
         return N_phrase_num(tr[0])
-    elif  # add code here
+    elif tr.label() == "AN":
+        return N_phrase_num(tr[0])
+    elif tr.label() == "NP":
+        return N_phrase_num(tr[0])
 
 def V_phrase_num(tr):
     """returns the number attribute of a verb-like tree, based on its head verb,
@@ -100,7 +118,14 @@ def V_phrase_num(tr):
         return tr[0][1]  # the s or p from Is,Ts or Ip,Tp
     elif (tr.label() == 'VP'):
         return V_phrase_num(tr[0])
-    elif  # add code here
+    elif (tr.label() == 'BE'):
+        return V_phrase_num(tr[0])
+    elif (tr.label() == 'DO'):
+        return V_phrase_num(tr[0])
+    elif (tr.label() == 'Rel'):
+        return V_phrase_num(tr[0])
+    elif (tr.label() == 'QP'):
+        return V_phrase_num(tr[0])
 
 def matches(n1,n2):
     return (n1==n2 or n1=='' or n2=='')
@@ -110,9 +135,9 @@ def check_node(tr):
     rule = top_level_rule(tr)
     if (rule == 'S -> WHICH Nom QP QM'):
         return (matches (N_phrase_num(tr[1]), V_phrase_num(tr[2])))
-    elif (rule == 'NP -> AR Nom'):
+    else: #(rule == 'NP -> AR Nom'):
         return (N_phrase_num(tr[1]) == 's')
-    elif  # add code here
+    #elif  # add code here
 
 def check_all_nodes(tr):
     """checks agreement constraints everywhere in tr"""
@@ -162,11 +187,15 @@ def restore_words(tr,wds):
 if __name__ == "__main__":
     #code for a simple testing, feel free to modify
     lx = Lexicon()
-    lx.add('John','P')
-    lx.add('like','T')
-    tr0 = all_valid_parses(lx, ['Who','likes','John','?'])[0]
-    tr = restore_words(tr0,['Who','likes','John','?'])
-    tr.draw()
+    #tr0 = all_valid_parses(lx, ['Who','likes','John','?'])[0]
+    #tr = restore_words(tr0,['Who','likes','John','?'])
+    #tr.draw()
+    lx.add("John", "P")
+    lx.add("like", "T")
+    lx.add("Who", "WHO")
+    lx.add("?", "?")
+    lx.add("does", "I")
+    print(all_parses(['Who', 'does', 'John', 'like', '?'], lx))
 
 # End of PART C.
 

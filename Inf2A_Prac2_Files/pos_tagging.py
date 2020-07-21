@@ -79,37 +79,44 @@ def noun_stem(s):
 def tag_word(lx, wd):
     """returns a list of all possible tags for wd relative to lx"""
     tags = []
-
+    print("tagging word")
     for i in function_words_tags:
         if wd == i[0]:
             tags.append(i[1])
-
+    print("tags", tags)
     for i in "PAINT":
         returned = lx.getAll(i)
+        print(returned, len(returned))
         # print(returned)
         if (len(returned) != 0):
             for j in returned:
                 if j[0] == wd:
 
-                    if j[1] not in tags:
-                        tags.append(j[1])
+                    #if j[1] not in tags:
+                    #    tags.append(j[1])
                     if j[1] == "N":
                         if noun_stem(wd) == "":
-                            if j[1] not in tags:
+                            #if j[1] not in tags:
+                            tags.append(j[1] + "p")
+                            if j[0] in unchanging_plurals_list:
                                 tags.append(j[1] + "s")
                         else:
-                            if j[1] not in tags:
-                                tags.append(j[1] + "p")
+                            #if j[1] not in tags:
+                            tags.append(j[1] + "s")
                     if j[1] in "IT":
+                        print("in IT")
                         if verb_stem(wd) == "":
-                            if j[1] not in tags:
+                            #if j[1] not in tags:
+                            print("plurals")
+                            tags.append(j[1] + "p")
+                            if j[0] in unchanging_plurals_list:
                                 tags.append(j[1] + "s")
                         else:
-                            if j[1] not in tags:
-                                tags.append(j[1] + "p")
+                            #if j[1] not in tags:
+                            tags.append(j[1] + "s")
                     if j[1] in "PA":
-                        if j[1] not in tags:
-                            tags.append(j[1])
+                        #if j[1] not in tags:
+                        tags.append(j[1])
     return tags
         
 
@@ -123,15 +130,21 @@ def tag_words(lx, wds):
         return [[fst] + rst for fst in tag_first for rst in tag_rest]
 
 # Some testing
-# print("TESTING")
-# lx = Lexicon()
-# lx.add("John", "P")
-# lx.add("Mary", "P")
-# lx.add("like", "T")
-# lx.add("fly", "I")
-# lx.add("fly", "N")
-# wd = "John"
+print("TESTING")
+lx = Lexicon()
+lx.add("John", "P")
+lx.add("Mary", "P")
+lx.add("like", "T")
+lx.add("fly", "I")
+lx.add("fly", "N")
+lx.add("fish", "N")
+lx.add("fish", "I")
+lx.add("fish", "T")
+lx.add("orange", "N")
+lx.add("orange", "A")
+wd = "John"
 
-# print(tag_word(lx, "John"))
+#print(tag_word(lx, "fish"))
+print("(", verb_stem("untie"), ")")
 
 # End of PART B.
