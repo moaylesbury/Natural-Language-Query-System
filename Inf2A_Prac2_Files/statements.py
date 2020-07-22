@@ -90,16 +90,22 @@ def verb_stem(s):
 
     print("3s form: ", s, " Verbstem: ", verbstem)
 
+    # number of  3gs and verb stem tags counted
     stags, vstags = 0, 0
 
+    # don't check have, are, do so just return the stem
 
-    for m in brown.tagged_words():
-        if m[0] == s:
-            if m[1] == "VB":
-                stags += 1
-        elif m[0] == verbstem:
-            if m[1] == "VBZ":
-                vstags += 1
+    if s == "have" or s == "are" or s == "do":
+        return verbstem
+    # otherwise count tags
+    else:
+        for m in brown.tagged_words():
+            if m[0] == s:
+                if m[1] == "VB":
+                    stags += 1
+            elif m[0] == verbstem:
+                if m[1] == "VBZ":
+                    vstags += 1
 
     print("stags ", stags, " vstags: ", vstags)
 

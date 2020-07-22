@@ -97,23 +97,23 @@ def tag_word(lx, wd):
                     if j[1] == "N":
                         if noun_stem(wd) == "":
                             #if j[1] not in tags:
-                            tags.append(j[1] + "p")
+                            tags.append(j[1] + "s")
                             if j[0] in unchanging_plurals_list:
-                                tags.append(j[1] + "s")
+                                tags.append(j[1] + "p")
                         else:
                             #if j[1] not in tags:
-                            tags.append(j[1] + "s")
+                            tags.append(j[1] + "p")
                     if j[1] in "IT":
                         print("in IT")
                         if verb_stem(wd) == "":
                             #if j[1] not in tags:
                             print("plurals")
-                            tags.append(j[1] + "p")
+                            tags.append(j[1] + "s")
                             if j[0] in unchanging_plurals_list:
-                                tags.append(j[1] + "s")
+                                tags.append(j[1] + "p")
                         else:
                             #if j[1] not in tags:
-                            tags.append(j[1] + "s")
+                            tags.append(j[1] + "p")
                     if j[1] in "PA":
                         #if j[1] not in tags:
                         tags.append(j[1])
@@ -130,6 +130,7 @@ def tag_words(lx, wds):
         return [[fst] + rst for fst in tag_first for rst in tag_rest]
 
 # Some testing
+"""
 print("TESTING")
 lx = Lexicon()
 lx.add("John", "P")
@@ -144,7 +145,15 @@ lx.add("orange", "N")
 lx.add("orange", "A")
 wd = "John"
 
-#print(tag_word(lx, "fish"))
-print("(", verb_stem("untie"), ")")
+outs = []
+for word in ["John", "orange", "fish", "a", "kadgnkgn"]:
+    outs.append(tag_word(lx, word))
 
+print("##########################")
+print(outs)
+print("##########################")
+"""
+#print(tag_word(lx, "fish"))
+#print("(", verb_stem("fish"), ")")
+#fizz, daze doesnt work
 # End of PART B.

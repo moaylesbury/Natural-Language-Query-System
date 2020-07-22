@@ -57,11 +57,6 @@ def all_parses(wlist, lx):
         print("looping allp")
         allp = allp + [t for t in chartpsr.parse(tagging)]
         print("allp length: ", len(allp))
-        for a in allp:
-            tr = Tree(a)
-            print("Drawing")
-            tr.draw()
-        print("Successful?")
     return allp
 
 # This produces parse trees of type Tree.
@@ -195,7 +190,9 @@ if __name__ == "__main__":
     lx.add("Who", "WHO")
     lx.add("?", "?")
     lx.add("does", "I")
-    print(all_parses(['Who', 'does', 'John', 'like', '?'], lx))
+    allp = all_parses(['Who', 'does', 'John', 'like', '?'], lx)
+    print(allp)
+    #Tree(allp).draw()
 
 # End of PART C.
 
