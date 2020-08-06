@@ -19,28 +19,27 @@
     #    AN[x]  -> N[x] | A AN[x]
     #    Rel[x] -> WHO VP[x] | NP[y] T[y]
     #    N[s]   -> "Ns"  etc.
-    '''
-       S     -> WHO QP QM | WHICH Nom QP QM
-       QP    -> VP | DO NP T
-       VP    -> I | T NP | BE A | BE NP | VP AND VP
-       NP    -> P | AR Nom | Nom
-       Nom   -> AN | AN Rel
-       AN    -> N | A AN
-       Rel   -> WHO VP | NP T
 
-       N     -> "Ns" | "Np"
-       I    -> "Is" | "Ip"
-       T    -> "Ts" | "Tp"
-       A     -> "A"
-       P     -> "P"
-       BE    -> "BEs" | "BEp"
-       DO    -> "DOs" | "DOp"
-       AR    -> "AR"
-       WHO   -> "WHO"
-       WHICH -> "WHICH"
-       AND   -> "AND"
-       QM    -> "?"
-    '''
+    #S     -> WHO QP QM | WHICH Nom QP QM
+    #QP    -> VP | DO NP T
+    #VP    -> I | T NP | BE A | BE NP | VP AND VP
+    #NP    -> P | AR Nom | Nom
+    #Nom   -> AN | AN Rel
+    #AN    -> N | A AN
+    #Rel   -> WHO VP | NP T
+    #N     -> "Ns" | "Np"
+    #I    -> "Is" | "Ip"
+    #T    -> "Ts" | "Tp"
+    #A     -> "A"
+    #P     -> "P"
+    #BE    -> "BEs" | "BEp"
+    #DO    -> "DOs" | "DOp"
+    #AR    -> "AR"
+    #WHO   -> "WHO"
+    #WHICH -> "WHICH"
+    #AND   -> "AND"
+    #QM    -> "?"
+
 
 from agreement import *
 
@@ -66,29 +65,54 @@ def sem(tr):
         return '(\\x.' + sem(tr[1]) + '(x))'
     elif rule == "S -> WHICH Nom QP QM":
         return '(\\x.' + sem(tr[1]) + ') & (' + sem(tr[2]) + ')'
+
+
     elif rule == "QP -> VP":
         return '(\\x.' + sem(tr[0]) + '(x))'
     elif rule == "QP -> DO NP T":
         return ''
+
+
     elif rule == "VP -> I":
+        return sem(tr[0])
     elif rule == "VP -> T NP":
+        return '(\\x.' + sem(tr[0]) + '(x) & '+ sem(tr[1]) + '(x))'
     elif rule == "VP -> BE A":
+        return '(\\x.' + sem(tr[1]) + '(x))'
     elif rule == "VP -> BE NP":
+        return '(\\x.' + sem(tr[1]) + '(x))'
+
+
     elif rule == "Nom -> AN":
+        return '(\\x.' + sem(tr[0]) + '(x))'
     elif rule == "Nom -> AN Rel":
+        return '(\\x.' + sem(tr[0]) + '(x))'
+
     elif rule == "AN -> VP AND VP":
         return '(\\x.' + sem(tr[0]) + '(x) & '+ sem(tr[2]) + '(x))'
     elif rule == "AN -> N":
         return sem(tr[0])
     elif (rule == 'AN -> A AN'):
         return '(\\x.(' + sem(tr[0]) + '(x) & ' + sem(tr[1]) + '(x)))'
+
+
     elif rule == "Rel -> WHO VP":
+        return '(\\x.' + sem(tr[0]) + '(x)'
     elif rule == "Rel -> NP T":
+        return '(\\x.' + sem(tr[0]) + '(x) & ' + sem(tr[1]) + '(x))'
+
     elif (rule == 'NP -> AR Nom'):
+        return '(\\x.' + sem(tr[0]) + '(x) & ' + sem(tr[1]) + '(x))'
     elif (rule == 'NP -> Nom'):
+        return '(\\x.' + sem(tr[0]) + '(x)'
     elif (rule == 'NP -> P'):
         return '(\\x.(x = ' + sem(tr[0]) + '))'
-    elif  # add more code here
+
+
+    #double check this
+    else:
+        print("hmmmm")
+        return sem(tr[0])
 
 
 
@@ -161,13 +185,15 @@ def find_all_solutions (L,entities,fb):
 # Interactive dialogue session
 
 def fetch_input():
-    s = raw_input('$$ ')
+    s = input('$$ ')
     while (s.split() == []):
-        s = raw_input('$$ ')
+        s = input('$$ ')
     return s    
 
+
 def output(s):
-    print ('     '+s)
+    print('     '+s)
+
 
 def dialogue():
     lx = Lexicon()
@@ -175,49 +201,54 @@ def dialogue():
     output('')
     s = fetch_input()
     while (s.split() == []):
-        s = raw_input('$$ ')
+        s = input('$$ ')
     while (s != 'exit'):
-        if (s[-1]=='?'):
+        if (s[-1] == '?'):
             sent = s[:-1] + ' ?'  # tolerate absence of space before '?'
             if len(sent) == 0:
-                output ("Eh??")
+                output("Eh??" + " 1")
             else:
                 wds = sent.split()
-                trees = all_valid_parses(lx,wds)
-                if (len(trees)==0):
-                    output ("Eh??")
-                elif (len(trees)>1):
-                    output ("Ambiguous!")
+                trees = all_valid_parses(lx, wds)
+
+                output("----------trees----------")
+                print(trees)
+                output("----------trees----------")
+
+                if (len(trees) == 0):
+                    output("Eh??" + " 2")
+                elif (len(trees) > 1):
+                    output("Ambiguous!")
                 else:
-                    tr = restore_words (trees[0],wds)
+                    tr = restore_words(trees[0], wds)
                     lam_exp = lp.parse(sem(tr))
                     L = lam_exp.simplify()
                     # print L  # useful for debugging
                     entities = lx.getAll('P')
-                    results = find_all_solutions (L,entities,fb)
+                    results = find_all_solutions(L, entities, fb)
                     if (results == []):
                         if (wds[0].lower() == 'who'):
-                            output ("No one")
+                            output("No one")
                         else:
-                            output ("None")
+                            output("None")
                     else:
                         buf = ''
                         for r in results:
                             buf = buf + r + '  '
-                        output (buf)
-        elif (s[-1]=='.'):
+                        output(buf)
+        elif (s[-1] == '.'):
             s = s[:-1]  # tolerate final full stop
             if len(s) == 0:
-                output ("Eh??")
+                output("Eh??")
             else:
                 wds = s.split()
-                msg = process_statement(lx,wds,fb)
+                msg = process_statement(lx, wds, fb)
                 if (msg == ''):
-                    output ("OK.")
+                    output("OK.")
                 else:
-                    output ("Sorry - " + msg)
+                    output("Sorry - " + msg)
         else:
-            output ("Please end with \".\" or \"?\" to avoid confusion.")
+            output("Please end with \".\" or \"?\" to avoid confusion.")
         s = fetch_input()
             
 if __name__ == "__main__":
