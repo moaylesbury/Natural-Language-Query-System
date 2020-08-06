@@ -10,22 +10,94 @@
 
 # PART D: Semantics for the Query Language.
 
+    #    S      -> WHO QP[y] QM | WHICH Nom[y] QP[y] QM
+    #    QP[x]  -> VP[x] | DO[y] NP[y] T[p]
+    #    VP[x]  -> I[x] | T[x] NP | BE[x] A | BE[x] NP[x] | VP[x] AND VP[x]
+    #    NP[s]  -> P | AR Nom[s]
+    #    NP[p]  -> Nom[p]
+    #    Nom[x] -> AN[x] | AN[x] Rel[x]
+    #    AN[x]  -> N[x] | A AN[x]
+    #    Rel[x] -> WHO VP[x] | NP[y] T[y]
+    #    N[s]   -> "Ns"  etc.
+    '''
+       S     -> WHO QP QM | WHICH Nom QP QM
+       QP    -> VP | DO NP T
+       VP    -> I | T NP | BE A | BE NP | VP AND VP
+       NP    -> P | AR Nom | Nom
+       Nom   -> AN | AN Rel
+       AN    -> N | A AN
+       Rel   -> WHO VP | NP T
+
+       N     -> "Ns" | "Np"
+       I    -> "Is" | "Ip"
+       T    -> "Ts" | "Tp"
+       A     -> "A"
+       P     -> "P"
+       BE    -> "BEs" | "BEp"
+       DO    -> "DOs" | "DOp"
+       AR    -> "AR"
+       WHO   -> "WHO"
+       WHICH -> "WHICH"
+       AND   -> "AND"
+       QM    -> "?"
+    '''
+
 from agreement import *
 
 def sem(tr):
     """translates a syntax tree into a logical lambda expression (in string form)"""
     rule = top_level_rule(tr)
-    if (tr.label() == 'P'):
+
+
+    if (tr.label() == 'P'):       # entities
         return tr[0][0]
-    elif (tr.label() == 'N'):
+    elif (tr.label() == 'N'):     # unary predicate
         return '(\\x.' + tr[0][0] + '(x))'  # \\ is escape sequence for \
-    elif  # add code here
-    
+    elif (tr.label() == 'A'):     # unary predicate
+        return '(\\x.' + tr[0][0] + '(x))'
+    elif (tr.label() == 'I'):     # unary predicate
+        return '(\\x.' + tr[0][0] + '(x))'
+    elif (tr.label() == 'T'):     # binary predicate
+        return '(\\x. (exists y.(' + tr[0][0] + ' & ' + tr[0][1] + ')))'
+
+
+
+    elif rule == "S -> WHO QP QM":
+        return '(\\x.' + sem(tr[1]) + '(x))'
+    elif rule == "S -> WHICH Nom QP QM":
+        return '(\\x.' + sem(tr[1]) + ') & (' + sem(tr[2]) + ')'
+    elif rule == "QP -> VP":
+        return '(\\x.' + sem(tr[0]) + '(x))'
+    elif rule == "QP -> DO NP T":
+        return ''
+    elif rule == "VP -> I":
+    elif rule == "VP -> T NP":
+    elif rule == "VP -> BE A":
+    elif rule == "VP -> BE NP":
+    elif rule == "Nom -> AN":
+    elif rule == "Nom -> AN Rel":
+    elif rule == "AN -> VP AND VP":
+        return '(\\x.' + sem(tr[0]) + '(x) & '+ sem(tr[2]) + '(x))'
+    elif rule == "AN -> N":
+        return sem(tr[0])
     elif (rule == 'AN -> A AN'):
         return '(\\x.(' + sem(tr[0]) + '(x) & ' + sem(tr[1]) + '(x)))'
+    elif rule == "Rel -> WHO VP":
+    elif rule == "Rel -> NP T":
+    elif (rule == 'NP -> AR Nom'):
+    elif (rule == 'NP -> Nom'):
     elif (rule == 'NP -> P'):
         return '(\\x.(x = ' + sem(tr[0]) + '))'
     elif  # add more code here
+
+
+
+
+
+
+
+
+
 
 
 # Logic parser for lambda expressions
