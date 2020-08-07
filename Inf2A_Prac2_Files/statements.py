@@ -56,12 +56,13 @@ class FactBase:
 
 def verb_stem(s):
     """extracts the stem from the 3sg form of a verb, or returns empty string"""
+    """3s = third person singular form, eg flies -> fly"""
     #nltk.download('brown')
 
-    #
+    # copies s to a string that will be the verbstem
     verbstem = s
 
-    # Finding verb stem
+    # finding verb stem
 
     # have -> has
     if (re.match('have', s)):
@@ -83,8 +84,8 @@ def verb_stem(s):
     elif (re.match('.+([ox]|(?<=(ch|sh|ss|zz)))$', s)):
         #return s + "es"
         verbstem += "es"
-    else:
-        return ""
+    #else:
+     #   return ""
 
     # Checking with the corpus
 
@@ -99,12 +100,13 @@ def verb_stem(s):
         return verbstem
     # otherwise count tags
     else:
+        # verb stem tagged VB and 3s form VBZ
         for m in brown.tagged_words():
             if m[0] == s:
-                if m[1] == "VB":
+                if m[1] == "VBZ":
                     stags += 1
             elif m[0] == verbstem:
-                if m[1] == "VBZ":
+                if m[1] == "VB":
                     vstags += 1
 
     print("stags ", stags, " vstags: ", vstags)
@@ -115,7 +117,7 @@ def verb_stem(s):
     if stags + vstags > 0:
         return verbstem
 
-    # verb stem tagged VB and 3s form VBZ
+
 
 
 
