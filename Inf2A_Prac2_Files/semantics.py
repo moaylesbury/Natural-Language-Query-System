@@ -48,10 +48,10 @@ def sem(tr):
     rule = top_level_rule(tr)
     print("#")
     print("#")
-    print("------------TREE------------")
-    print(tr)
-    print(tr[0])
-    print("------------TREE------------")
+    #ßprint("------------TREE------------")
+    #print(tr)
+    #print(tr[0])
+    #print("------------TREE------------")
     print("------------LABEL&RULE------------")
     print(tr.label(), "  &&&  ", rule)
     print("------------LABEL&RULE------------")
@@ -91,7 +91,7 @@ def sem(tr):
     elif rule == "VP -> I":
         return sem(tr[0])
     elif rule == "VP -> T NP":
-        return 'exists y.(' + sem(tr[1]) + ' & ' + sem(tr[0]) + ')'
+        return '(exists y.(' + sem(tr[1]) + '(y) & ' + sem(tr[0]) + '))'
     elif rule == "VP -> BE A":
         return '(' + sem(tr[1]) + ')'
     elif rule == "VP -> BE NP":
@@ -108,8 +108,8 @@ def sem(tr):
         return '(' + sem(tr[0]) + ' & ' + sem(tr[2]) + ')'
     elif rule == "AN -> N":
         return sem(tr[0])
-    elif (rule == 'AN -> A AN'):
-        return sem(tr[0]) + ' & ' + sem(tr[1])
+    elif (rule == 'AN -> A AN'):   ##############
+        return '(\\x.(' + sem(tr[0]) + '(x) & ' + sem(tr[1]) + '(x)))'
 
 
     elif rule == "Rel -> WHO VP":
@@ -122,7 +122,7 @@ def sem(tr):
         return sem(tr[1])
     elif (rule == 'NP -> Nom'):
         return sem(tr[0])
-    elif (rule == 'NP -> P'):
+    elif (rule == 'NP -> P'):   ##############
         return '(\\x.(x = ' + sem(tr[0]) + '))'
 
 
