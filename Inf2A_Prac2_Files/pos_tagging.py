@@ -79,43 +79,35 @@ def noun_stem(s):
 def tag_word(lx, wd):
     """returns a list of all possible tags for wd relative to lx"""
     tags = []
-    print("tagging word")
+    #print("TAGGING WORD:     " + wd)
     for i in function_words_tags:
         if wd == i[0]:
             tags.append(i[1])
-    print("tags", tags)
+    #print("tags", tags)
     for i in "PAINT":
         returned = lx.getAll(i)
-        print(returned, len(returned))
+        #-print(returned, len(returned))
         # print(returned)
         if (len(returned) != 0):
             for j in returned:
                 if j[0] == wd:
-
-                    #if j[1] not in tags:
-                    #    tags.append(j[1])
                     if j[1] == "N":
                         if noun_stem(wd) == "":
-                            #if j[1] not in tags:
                             tags.append(j[1] + "s")
                             if j[0] in unchanging_plurals_list:
                                 tags.append(j[1] + "p")
                         else:
-                            #if j[1] not in tags:
                             tags.append(j[1] + "p")
                     if j[1] in "IT":
                         print("in IT")
                         if verb_stem(wd) == "":
-                            #if j[1] not in tags:
                             print("plurals")
                             tags.append(j[1] + "s")
                             if j[0] in unchanging_plurals_list:
                                 tags.append(j[1] + "p")
                         else:
-                            #if j[1] not in tags:
                             tags.append(j[1] + "p")
                     if j[1] in "PA":
-                        #if j[1] not in tags:
                         tags.append(j[1])
     return tags
         

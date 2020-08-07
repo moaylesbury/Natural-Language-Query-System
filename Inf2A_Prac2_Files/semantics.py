@@ -46,11 +46,23 @@ from agreement import *
 def sem(tr):
     """translates a syntax tree into a logical lambda expression (in string form)"""
     rule = top_level_rule(tr)
+    print("#")
+    print("#")
+    print("------------TREE------------")
+    print(tr)
+    print(tr[0])
+    print("------------TREE------------")
+    print("------------LABEL&RULE------------")
+    print(tr.label(), "  &&&  ", rule)
+    print("------------LABEL&RULE------------")
+    print("#")
+    print("#")
 
 
     if (tr.label() == 'P'):       # entities
         return tr[0][0]
     elif (tr.label() == 'N'):     # unary predicate
+        print("Inside: " + tr.label())
         return '(\\x.' + tr[0][0] + '(x))'  # \\ is escape sequence for \
     elif (tr.label() == 'A'):     # unary predicate
         return '(\\x.' + tr[0][0] + '(x))'
@@ -62,12 +74,14 @@ def sem(tr):
 
 
     elif rule == "S -> WHO QP QM":
+        print("Inside: " + rule)
         return '(\\x.' + sem(tr[1]) + '(x))'
     elif rule == "S -> WHICH Nom QP QM":
         return '(\\x.' + sem(tr[1]) + ') & (' + sem(tr[2]) + ')'
 
 
     elif rule == "QP -> VP":
+        print("Inside: " + rule)
         return '(\\x.' + sem(tr[0]) + '(x))'
     elif rule == "QP -> DO NP T":
         return ''
@@ -80,6 +94,7 @@ def sem(tr):
     elif rule == "VP -> BE A":
         return '(\\x.' + sem(tr[1]) + '(x))'
     elif rule == "VP -> BE NP":
+        print("Inside: " + rule)
         return '(\\x.' + sem(tr[1]) + '(x))'
 
 
@@ -102,7 +117,8 @@ def sem(tr):
         return '(\\x.' + sem(tr[0]) + '(x) & ' + sem(tr[1]) + '(x))'
 
     elif (rule == 'NP -> AR Nom'):
-        return '(\\x.' + sem(tr[0]) + '(x) & ' + sem(tr[1]) + '(x))'
+        print("Inside: " + rule)
+        return '(\\x.' + sem(tr[1]) + '(x)'
     elif (rule == 'NP -> Nom'):
         return '(\\x.' + sem(tr[0]) + '(x)'
     elif (rule == 'NP -> P'):
@@ -150,8 +166,8 @@ def interpret_const_or_var(s,bindings,entities):
         return [p[1] for p in bindings if p[0]==s][0]  # finds most recent binding
 
 def model_check (P,bindings,entities,fb):
-    if (isinstance (P,ApplicationExpression)):
-        if (len(P.args)==1):
+    if (isinstance(P, ApplicationExpression)):
+        if (len(P.args) == 1):
             pred = P.function.__str__()
             arg = interpret_const_or_var(P.args[0].__str__(),bindings,entities)
             return fb.queryUnary(pred,arg)
@@ -160,26 +176,27 @@ def model_check (P,bindings,entities,fb):
             arg0 = interpret_const_or_var(P.args[0].__str__(),bindings,entities)
             arg1 = interpret_const_or_var(P.args[1].__str__(),bindings,entities)
             return fb.queryBinary(pred,arg0,arg1)
-    elif (isinstance (P,EqualityExpression)):
+    elif (isinstance(P,EqualityExpression)):
         arg0 = interpret_const_or_var(P.first.__str__(),bindings,entities)
         arg1 = interpret_const_or_var(P.second.__str__(),bindings,entities)
         return (arg0 == arg1)
-    elif (isinstance (P,AndExpression)):
-        return (model_check (P.first,bindings,entities,fb) and
-                model_check (P.second,bindings,entities,fb))
-    elif (isinstance (P,ExistsExpression)):
+    elif (isinstance(P, AndExpression)):
+        return (model_check(P.first, bindings, entities, fb) and
+                model_check(P.second, bindings, entities, fb))
+    elif (isinstance(P, ExistsExpression)):
         v = str(P.variable)
         P1 = P.term
         for e in entities:
-            bindings1 = [(v,e)] + bindings
-            if (model_check (P1,bindings1,entities,fb)):
+            bindings1 = [(v, e)] + bindings
+            if (model_check(P1, bindings1, entities, fb)):
                 return True
         return False
 
-def find_all_solutions (L,entities,fb):
+
+def find_all_solutions(L, entities, fb):
     v = str(L.variable)
     P = L.term
-    return [e for e in entities if model_check(P,[(v,e)],entities,fb)]
+    return [e for e in entities if model_check(P, [(v, e)], entities, fb)]
 
 
 # Interactive dialogue session
@@ -209,6 +226,9 @@ def dialogue():
                 output("Eh??" + " 1")
             else:
                 wds = sent.split()
+
+                print("wds", wds)
+
                 trees = all_valid_parses(lx, wds)
 
                 output("----------trees----------")
@@ -252,5 +272,14 @@ def dialogue():
         s = fetch_input()
             
 if __name__ == "__main__":
-    dialogue()
+    # Testing of sem()
+    tr0 = [Tree('S', [Tree('WHO', ['WHO']), Tree('QP', [Tree('VP', [Tree('BE', ['BEs']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Np'])])])])])]), Tree('QM', ['?'])])]
+    tr = restore_words(tr0[0], ["Who", "is", "a", "duck", "?"])
+    print(tr)
+    #tr.draw()
+    exp = sem(tr[0])
+    print(exp)
+    #A = lp.parse(exp)
+    #print(A.simplify())
+    #dialogue()
 # End of PART D.

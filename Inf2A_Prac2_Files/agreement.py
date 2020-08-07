@@ -50,9 +50,6 @@ def all_parses(wlist, lx):
     print(tag_words(lx, wlist))
     for tagging in tag_words(lx, wlist):
         allp = allp + [t for t in chartpsr.parse(tagging)]
-        print("------------------------------")
-        print(allp)
-        print("------------------------------")
     return allp
 
 # This produces parse trees of type Tree.
@@ -269,9 +266,10 @@ if __name__ == "__main__":
     #tr.draw()
     lx.add("John", "P")
     lx.add("likes", "T")
+    lx.add("like", "T")
     lx.add("Who", "WHO")
     lx.add("?", "?")
-    lx.add("does", "I")
+    lx.add("does", "DOs")
     lx.add("Which", "WHICH")
     lx.add("orange", "A")
     lx.add("a", "AR")
@@ -286,8 +284,10 @@ if __name__ == "__main__":
     #allp = all_parses(["Which", "orange", "duck", "likes", "a", "frog", "?"], lx)
     #allp = [Tree('S', [Tree('WHICH', ['WHICH']), Tree('Nom', [Tree('AN', [Tree('A', ['A']), Tree('AN', [Tree('N', ['Np'])])])]), Tree('QP', [Tree('VP', [Tree('T', ['Ts']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Ns'])])])])])]), Tree('QM', ['?'])])]
 
-    # allp = all_parses(["Who", "is", "a", "duck", "?"], lx)
-    allp = all_parses(["John", "is", "a", "duck"], lx)
+    allp = all_parses(["Who", "is", "a", "duck", "?"], lx) #w
+    #allp = all_parses(["John", "is", "a", "duck"], lx)        #dw
+    #allp = all_parses(["Which", "orange", "duck", "likes", "a", "frog", "?"], lx)
+    #allp = all_parses(["Who", "does", "John", "like", "?"], lx)
     print("-------------")
     print(allp)
     print("-------------")
