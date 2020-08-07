@@ -69,58 +69,59 @@ def sem(tr):
     elif (tr.label() == 'I'):     # unary predicate
         return '(\\x.' + tr[0][0] + '(x))'
     elif (tr.label() == 'T'):     # binary predicate
-        return '(\\x. (exists y.(' + tr[0][0] + ' & ' + tr[0][1] + ')))'
+        print("Inside: " + tr.label())
+        return tr[0][0] + '(x,y)'
 
 
 
     elif rule == "S -> WHO QP QM":
         print("Inside: " + rule)
-        return '(\\x.' + sem(tr[1]) + '(x))'
+        return sem(tr[1])
     elif rule == "S -> WHICH Nom QP QM":
-        return '(\\x.' + sem(tr[1]) + ') & (' + sem(tr[2]) + ')'
+        return sem(tr[1]) + ' & ' + sem(tr[2])
 
 
     elif rule == "QP -> VP":
         print("Inside: " + rule)
-        return '(\\x.' + sem(tr[0]) + '(x))'
+        return sem(tr[0])
     elif rule == "QP -> DO NP T":
-        return ''
+        return '(' + sem(tr[1]) + ' & ' + sem(tr[0]) + ')'
 
 
     elif rule == "VP -> I":
         return sem(tr[0])
     elif rule == "VP -> T NP":
-        return '(\\x.' + sem(tr[0]) + '(x) & '+ sem(tr[1]) + '(x))'
+        return 'exists y.(' + sem(tr[1]) + ' & ' + sem(tr[0]) + ')'
     elif rule == "VP -> BE A":
-        return '(\\x.' + sem(tr[1]) + '(x))'
+        return '(' + sem(tr[1]) + ')'
     elif rule == "VP -> BE NP":
         print("Inside: " + rule)
-        return '(\\x.' + sem(tr[1]) + '(x))'
+        return sem(tr[1])
 
 
     elif rule == "Nom -> AN":
-        return '(\\x.' + sem(tr[0]) + '(x))'
+        return sem(tr[0])
     elif rule == "Nom -> AN Rel":
-        return '(\\x.' + sem(tr[0]) + '(x))'
+        return '(' + sem(tr[0]) + ')'
 
     elif rule == "AN -> VP AND VP":
-        return '(\\x.' + sem(tr[0]) + '(x) & '+ sem(tr[2]) + '(x))'
+        return '(' + sem(tr[0]) + ' & ' + sem(tr[2]) + ')'
     elif rule == "AN -> N":
         return sem(tr[0])
     elif (rule == 'AN -> A AN'):
-        return '(\\x.(' + sem(tr[0]) + '(x) & ' + sem(tr[1]) + '(x)))'
+        return sem(tr[0]) + ' & ' + sem(tr[1])
 
 
     elif rule == "Rel -> WHO VP":
-        return '(\\x.' + sem(tr[0]) + '(x)'
+        return '(' + sem(tr[0]) + ')'
     elif rule == "Rel -> NP T":
-        return '(\\x.' + sem(tr[0]) + '(x) & ' + sem(tr[1]) + '(x))'
+        return '(' + sem(tr[0]) + '(x) & ' + sem(tr[1]) + ')'
 
     elif (rule == 'NP -> AR Nom'):
         print("Inside: " + rule)
-        return '(\\x.' + sem(tr[1]) + '(x)'
+        return sem(tr[1])
     elif (rule == 'NP -> Nom'):
-        return '(\\x.' + sem(tr[0]) + '(x)'
+        return sem(tr[0])
     elif (rule == 'NP -> P'):
         return '(\\x.(x = ' + sem(tr[0]) + '))'
 
@@ -273,13 +274,15 @@ def dialogue():
             
 if __name__ == "__main__":
     # Testing of sem()
-    tr0 = [Tree('S', [Tree('WHO', ['WHO']), Tree('QP', [Tree('VP', [Tree('BE', ['BEs']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Np'])])])])])]), Tree('QM', ['?'])])]
-    tr = restore_words(tr0[0], ["Who", "is", "a", "duck", "?"])
+    #tr0 = [Tree('S', [Tree('WHO', ['WHO']), Tree('QP', [Tree('VP', [Tree('BE', ['BEs']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Np'])])])])])]), Tree('QM', ['?'])])]
+    tr0 = [Tree('S', [Tree('WHICH', ['WHICH']), Tree('Nom', [Tree('AN', [Tree('A', ['A']), Tree('AN', [Tree('N', ['Np'])])])]), Tree('QP', [Tree('VP', [Tree('T', ['Ts']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Ns'])])])])])]), Tree('QM', ['?'])])]
+    #tr = restore_words(tr0[0], ["Who", "is", "a", "duck", "?"])
+    tr = restore_words(tr0[0], ["Which", "orange", "duck", "likes", "a", "frog", "?"])
     print(tr)
     #tr.draw()
-    exp = sem(tr[0])
+    exp = sem(tr)
     print(exp)
-    #A = lp.parse(exp)
-    #print(A.simplify())
+    A = lp.parse(exp)
+    print(A.simplify())
     #dialogue()
 # End of PART D.
