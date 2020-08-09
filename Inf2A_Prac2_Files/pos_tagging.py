@@ -91,22 +91,31 @@ def tag_word(lx, wd):
         if (len(returned) != 0):
             for j in returned:
                 if j[0] == wd:
+                    if j[0] in unchanging_plurals_list:
+                        tags.append(j[1] + "p")
+                        print("----unchanging----")
+                        print(j)
+                        print("----unchanging----")
                     if j[1] == "N":
+                        print(j)
+                        print("Noun stem: ", noun_stem(wd))
                         if noun_stem(wd) == "":
                             tags.append(j[1] + "s")
-                            if j[0] in unchanging_plurals_list:
-                                tags.append(j[1] + "p")
+                            print("SINGULAR")
+                            #if j[0] in unchanging_plurals_list:
+                                #tags.append(j[1] + "s")
                         else:
                             tags.append(j[1] + "p")
+                            print("PLURAL")
                     if j[1] in "IT":
                         print("in IT")
                         if verb_stem(wd) == "":
                             print("plurals")
-                            tags.append(j[1] + "s")
-                            if j[0] in unchanging_plurals_list:
-                                tags.append(j[1] + "p")
-                        else:
                             tags.append(j[1] + "p")
+                            print("PLURAL")
+                        else:
+                            tags.append(j[1] + "s")
+                            print("SINGULAR")
                     if j[1] in "PA":
                         tags.append(j[1])
     return tags
@@ -145,6 +154,7 @@ print("##########################")
 print(outs)
 print("##########################")
 """
+
 #print(tag_word(lx, "fish"))
 #print("(", verb_stem("fish"), ")")
 #fizz, daze doesnt work

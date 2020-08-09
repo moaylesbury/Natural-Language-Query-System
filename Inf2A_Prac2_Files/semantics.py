@@ -276,16 +276,22 @@ if __name__ == "__main__":
     # Testing of sem()
     #tr0 = [Tree('S', [Tree('WHO', ['WHO']), Tree('QP', [Tree('VP', [Tree('BE', ['BEs']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Np'])])])])])]), Tree('QM', ['?'])])]
     #tr0 = [Tree('S', [Tree('WHICH', ['WHICH']), Tree('Nom', [Tree('AN', [Tree('A', ['A']), Tree('AN', [Tree('N', ['Np'])])])]), Tree('QP', [Tree('VP', [Tree('T', ['Ts']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Ns'])])])])])]), Tree('QM', ['?'])])]
+
+    tr0 = [Tree('S', [Tree('WHICH', ['WHICH']), Tree('Nom', [Tree('AN', [Tree('A', ['A']), Tree('AN', [Tree('N', ['Ns'])])])]), Tree('QP', [Tree('VP', [Tree('T', ['Ts']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Ns'])])])])])]), Tree('QM', ['?'])])]
+
+
     #tr = restore_words(tr0[0], ["Who", "is", "a", "duck", "?"])
-    #tr = restore_words(tr0[0], ["Which", "orange", "duck", "likes", "a", "frog", "?"])
+    tr = restore_words(tr0[0], ["Which", "orange", "duck", "likes", "a", "frog", "?"])
     #print(tr)
-    #tr.draw()
+    print("vs", verb_stem("likes"))
+    tr.draw()
+    #print(noun_stem("ducks"))
     #exp = sem(tr)
     #print(exp)
     #A = lp.parse(exp)
     #print(A.simplify())
     #dialogue()
-    print("likes:    ", verb_stem("likes"))
-    print("hates:    ", verb_stem("hates"))
-    print("bathes:    ", verb_stem("bathes"))
+    #print("likes:    ", verb_stem("likes"))
+    #print("hates:    ", verb_stem("hates"))
+    #print("bathes:    ", verb_stem("bathes"))
 # End of PART D.
