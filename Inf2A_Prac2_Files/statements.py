@@ -65,25 +65,29 @@ def verb_stem(s):
     # finding verb stem
 
     # have -> has
-    if (re.match('have', s)):
+    if (re.match('has', s)):
+        print("1")
         #return "has"
-        return "has"
+        return "have"
     # ends in s,x,y,z,ch,sh -> add s
     # ends in y preceded by a vowel -> add s
     # form Xie where x is a letter not a vowel -> add s
     # ends in se or ze but not sse or zze -> add s
     # ends in e not preceeded by i,o,s,x,z,ch,sh -> add s
-    elif (re.match('(.+([^aeiousxyz(ch)(sh)]|[aeiou]y|([^s]se|[^z]ze)|[^iosxz](?<!(ch|sh))e)$)|[^aeiou]ie$', s)):
+    elif (re.match('((.+([^aeiousxyz(ch)(sh)]|[aeiou]y|([^s]se|[^z]ze)|[^iosxz](?<!(ch|sh))e))|[^aeiou]ie)s$', s)):
+        print("2")
         #return s + "s"
-        verbstem += "s"
+        verbstem = verbstem[:-1]
     # ends in y preceeded by a non vowel and contains at least three letters -> change y to ies
-    elif (re.match('.+[^aeiou]y$', s)):
+    elif (re.match('.*[^aeiou]ies$', s)):
+        print("3")
         #return s[:-1] + "ies"
-        verbstem = verbstem[:-1] + "ies"
+        verbstem = verbstem[:-3] + 'y'
     # ends in o,x,ch,sh,ss,zz -> add es
-    elif (re.match('.+([ox]|(?<=(ch|sh|ss|zz)))$', s)):
+    elif (re.match('.+([ox]|(?<=(ch|sh|ss|zz)))es$', s)):
+        print("4")
         #return s + "es"
-        verbstem += "es"
+        verbstem = verbstem[:-2]
     #else:
      #   return ""
 
@@ -102,6 +106,8 @@ def verb_stem(s):
     else:
         # verb stem tagged VB and 3s form VBZ
         for m in brown.tagged_words():
+            if m[0] == "fizz":
+                print(m)
             if m[0] == s:
                 if m[1] == "VBZ":
                     stags += 1
@@ -164,7 +170,18 @@ def process_statement(lx, wlist, fb):
 # Testing
 
 #if __name__ == "__main__":
-  #  print("========Testing========")
+    #print("========Testing========")
+    #words = ["eats", "tells", "shows", "pays", "buys", "flies", "tries", "unifies", "dies", "lies", "ties", "goes", "boxes", "attaches", "washes", "dresses", "fizzes", "loses", "dazes", "lapses", "analyses", "has", "likes", "hates", "bathes"]
+    #correct = ["eat", "tell", "show", "pay", "buy", "fly", "try", "unify", "die", "lie", "tie", "go", "box", "attach", "wash", "dress", "fizz", "lose", "daze", "lapse", "analyse", "have", "like", "hate", "bathe"]
+
+    #for i in words:
+    #    print("--------------------------------------------------")
+    #    print("[--]", i, " --> ", verb_stem(i), "[--]")
+    #    print("--------------------------------------------------")
+    #stems = [verb_stem(i) for i in words]
+    #print(words)
+    #print(stems)
+    #print("========Testing========")
     # lx = Lexicon()
     # lx.add("John", "P")
     # lx.add("Mary", "P")
@@ -181,5 +198,5 @@ def process_statement(lx, wlist, fb):
 
    # threesgverbs = ["eat", "tell", "show", "pay", "buy", "fly", "try", "unify", "die", "lie", "tie", "go", "box", "attach", "wash", "dress", "fizz", "lose", "daze", "lapse", "analyse", "have"]
     ##[print(verb_stem(s)) for s in threesgverbs]
-    #sprint("=======================")
+
 
