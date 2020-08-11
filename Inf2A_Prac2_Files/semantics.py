@@ -60,13 +60,16 @@ def sem(tr):
 
 
     if (tr.label() == 'P'):       # entities
+        print("Inside: " + tr.label())
         return tr[0][0]
     elif (tr.label() == 'N'):     # unary predicate
         print("Inside: " + tr.label())
         return '(\\x.' + tr[0][0] + '(x))'  # \\ is escape sequence for \
     elif (tr.label() == 'A'):     # unary predicate
+        print("Inside: " + tr.label())
         return '(\\x.' + tr[0][0] + '(x))'
     elif (tr.label() == 'I'):     # unary predicate
+        print("Inside: " + tr.label())
         return '(\\x.' + tr[0][0] + '(x))'
     elif (tr.label() == 'T'):     # binary predicate
         print("Inside: " + tr.label())
@@ -76,7 +79,7 @@ def sem(tr):
 
     elif rule == "S -> WHO QP QM":
         print("Inside: " + rule)
-        return sem(tr[1])
+        return '(\\x.(' + sem(tr[1]) + '))'
     elif rule == "S -> WHICH Nom QP QM":
         return sem(tr[1]) + ' & ' + sem(tr[2])
 
@@ -85,14 +88,19 @@ def sem(tr):
         print("Inside: " + rule)
         return sem(tr[0])
     elif rule == "QP -> DO NP T":
-        return '(' + sem(tr[1]) + ' & ' + sem(tr[0]) + ')'
+        # return '(' + sem(tr[1]) + ' & ' + sem(tr[0]) + ')'
+        #return '(' + sem(tr[1]) + ' & ' + sem(tr[2]) + ')'
+        return '(exists y.(' + sem(tr[1]) + '(y) & ' + sem(tr[2]) + '))'
 
 
     elif rule == "VP -> I":
+        print("Inside: " + rule)
         return sem(tr[0])
     elif rule == "VP -> T NP":
+        print("Inside: " + rule)
         return '(exists y.(' + sem(tr[1]) + '(y) & ' + sem(tr[0]) + '))'
     elif rule == "VP -> BE A":
+        print("Inside: " + rule)
         return '(' + sem(tr[1]) + ')'
     elif rule == "VP -> BE NP":
         print("Inside: " + rule)
@@ -100,29 +108,38 @@ def sem(tr):
 
 
     elif rule == "Nom -> AN":
+        print("Inside: " + rule)
         return sem(tr[0])
     elif rule == "Nom -> AN Rel":
+        print("Inside: " + rule)
         return '(' + sem(tr[0]) + ')'
 
     elif rule == "AN -> VP AND VP":
+        print("Inside: " + rule)
         return '(' + sem(tr[0]) + ' & ' + sem(tr[2]) + ')'
     elif rule == "AN -> N":
+        print("Inside: " + rule)
         return sem(tr[0])
     elif (rule == 'AN -> A AN'):   ##############
+        print("Inside: " + rule)
         return '(\\x.(' + sem(tr[0]) + '(x) & ' + sem(tr[1]) + '(x)))'
 
 
     elif rule == "Rel -> WHO VP":
+        print("Inside: " + rule)
         return '(' + sem(tr[0]) + ')'
     elif rule == "Rel -> NP T":
+        print("Inside: " + rule)
         return '(' + sem(tr[0]) + '(x) & ' + sem(tr[1]) + ')'
 
     elif (rule == 'NP -> AR Nom'):
         print("Inside: " + rule)
         return sem(tr[1])
     elif (rule == 'NP -> Nom'):
+        print("Inside: " + rule)
         return sem(tr[0])
     elif (rule == 'NP -> P'):   ##############
+        print("Inside: " + rule)
         return '(\\x.(x = ' + sem(tr[0]) + '))'
 
 
@@ -277,19 +294,32 @@ if __name__ == "__main__":
     #tr0 = [Tree('S', [Tree('WHO', ['WHO']), Tree('QP', [Tree('VP', [Tree('BE', ['BEs']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Np'])])])])])]), Tree('QM', ['?'])])]
     #tr0 = [Tree('S', [Tree('WHICH', ['WHICH']), Tree('Nom', [Tree('AN', [Tree('A', ['A']), Tree('AN', [Tree('N', ['Np'])])])]), Tree('QP', [Tree('VP', [Tree('T', ['Ts']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Ns'])])])])])]), Tree('QM', ['?'])])]
 
-    tr0 = [Tree('S', [Tree('WHICH', ['WHICH']), Tree('Nom', [Tree('AN', [Tree('A', ['A']), Tree('AN', [Tree('N', ['Ns'])])])]), Tree('QP', [Tree('VP', [Tree('T', ['Ts']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Ns'])])])])])]), Tree('QM', ['?'])])]
+    # "Which orange duck likes a frog?" (works)
+    #tr0 = [Tree('S', [Tree('WHICH', ['WHICH']), Tree('Nom', [Tree('AN', [Tree('A', ['A']), Tree('AN', [Tree('N', ['Ns'])])])]), Tree('QP', [Tree('VP', [Tree('T', ['Ts']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Ns'])])])])])]), Tree('QM', ['?'])])]
+    #tr = restore_words(tr0[0], ["Which", "orange", "duck", "likes", "a", "frog", "?"])
 
+    # "Who is a duck?" (works)
+    #tr0 = [Tree('S', [Tree('WHO', ['WHO']), Tree('QP', [Tree('VP', [Tree('BE', ['BEs']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Ns'])])])])])]), Tree('QM', ['?'])])]
+    #tr = restore_words(tr0[0], ["Who", "is", "a", "duck", "?"])
+
+    # "Who does John like?" (works)
+    tr0 = [Tree('S', [Tree('WHO', ['WHO']), Tree('QP', [Tree('DO', ['DOs']), Tree('NP', [Tree('P', ['P'])]), Tree('T', ['Tp'])]), Tree('QM', ['?'])])]
+    tr = restore_words(tr0[0], ["Who", "does", "John", "like", "?"])
+
+
+    # (\x. (exists y.((y=John) & T_like(y,x))))
+    # \x.exists y.((y = John) & T_like(x,y))
 
     #tr = restore_words(tr0[0], ["Who", "is", "a", "duck", "?"])
-    tr = restore_words(tr0[0], ["Which", "orange", "duck", "likes", "a", "frog", "?"])
+
     #print(tr)
-    print("vs", verb_stem("likes"))
-    tr.draw()
+    #print("vs", verb_stem("likes"))
+    #tr.draw()
     #print(noun_stem("ducks"))
-    #exp = sem(tr)
+    exp = sem(tr)
     #print(exp)
-    #A = lp.parse(exp)
-    #print(A.simplify())
+    A = lp.parse(exp)
+    print(A.simplify())
     #dialogue()
     #print("likes:    ", verb_stem("likes"))
     #print("hates:    ", verb_stem("hates"))
