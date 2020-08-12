@@ -101,6 +101,7 @@ def top_level_rule(tr):
 
 def N_phrase_num(tr):
     """returns the number attribute of a noun-like tree, based on its head noun"""
+    print("-------N_phrase-------")
     print("tree: ", tr, " label: ", tr.label(), " subtrees: ", len(tr))
     if (tr.label() == 'N'):           # N -> "Ns" | "Np"
         return tr[0][1]               # the s or p from Ns or Np
@@ -130,6 +131,7 @@ def N_phrase_num(tr):
 
 
 def V_phrase_num(tr):
+    print("-------V_phrase-------")
     """returns the number attribute of a verb-like tree, based on its head verb,
        or '' if this is undetermined."""
     if (tr.label() == 'T' or tr.label() == 'I'):
@@ -191,6 +193,8 @@ def check_node(tr):
     rule = top_level_rule(tr)
     if (rule == 'S -> WHICH Nom QP QM'):
         print("Inside:    ", rule)
+        print("1234567890")
+        print("hjk: ", matches(N_phrase_num(tr[1]), V_phrase_num(tr[2])))
         return (matches(N_phrase_num(tr[1]), V_phrase_num(tr[2])))
     elif rule == 'QP -> VP':
         print("Inside:    ", rule)
@@ -200,11 +204,10 @@ def check_node(tr):
         return (matches(V_phrase_num(tr[0]), N_phrase_num(tr[1])) and matches(V_phrase_num(tr[1]), N_phrase_num(tr[2])))
     elif rule == 'VP -> I':
         print("Inside:    ", rule)
-        return True
+        return check_node(tr[0])
     elif rule == 'VP -> T NP':
         print("Inside:    ", rule)
         print('---------------')
-        #print(tag_word())
         print("*******N*******")
         print(N_phrase_num(tr[1]))
         print("****************")
@@ -217,7 +220,7 @@ def check_node(tr):
         return (matches(V_phrase_num(tr[0]), N_phrase_num(tr[1])))
     elif rule == 'VP -> BE A':
         print("Inside:    ", rule)
-        return True
+        return check_node(tr[0])
     elif rule == 'VP -> BE NP':
         print("Inside:    ", rule)
         return (matches(V_phrase_num(tr[0]), N_phrase_num(tr[1])))
@@ -226,31 +229,30 @@ def check_node(tr):
         return (matches(V_phrase_num(tr[0]), V_phrase_num(tr[2])))
     elif rule == 'NP -> P' or rule == 'NP -> Nom':
         print("Inside:    ", rule)
-        return True
+        return check_node(tr[0])
     elif rule == 'NP -> AR Nom ':
         print("Inside:    ", rule)
         return (matches(N_phrase_num(tr[0]), N_phrase_num(tr[0])))
     elif rule == 'Nom -> AN':
         print("Inside:    ", rule)
-        return True
+        return check_node(tr[0])
     elif rule == 'Nom -> AN Rel':
         print("Inside:    ", rule)
         return matches(N_phrase_num(tr[0]), V_phrase_num[1])
     elif rule == 'AN -> N':
         print("Inside:    ", rule)
-        return True
+        return check_node(tr[0])
     elif rule == 'AN -> A AN':
         print("Inside:    ", rule)
-        return True
+        return check_node(tr[0])
     elif rule == 'Rel -> WHO VP':
         print("Inside:    ", rule)
-        return True
+        return check_node(tr[0])
     elif rule == 'Rel -> NP T':
         print("Inside:    ", rule)
         return matches(N_phrase_num(tr[0]), V_phrase_num(tr[1]))
     else:
-        print("hmm")
-        return ""
+        return True
 
 
 
@@ -336,11 +338,12 @@ if __name__ == "__main__":
     print("=======================================")
 
     tt = Tree('S', [Tree('WHICH', ['WHICH']), Tree('Nom', [Tree('AN', [Tree('A', ['A']), Tree('AN', [Tree('N', ['Ns'])])])]), Tree('QP', [Tree('VP', [Tree('T', ['Ts']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Ns'])])])])])]), Tree('QM', ['?'])])
-
+    #tt.draw()
 
     #print(check_node(tt[2]))
-    print(tt[2])
-    print(check_node(tt[2]))
+    print(tt)
+    #print(check_node(tt[2]))
+    print(check_all_nodes(tt))
     #print(N_phrase_num(tt[2]))
     #print(N_phrase_num(tt[2][1]))
     #print(N_phrase_num(tt[1]))
