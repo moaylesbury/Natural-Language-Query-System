@@ -101,48 +101,54 @@ def top_level_rule(tr):
 
 def N_phrase_num(tr):
     """returns the number attribute of a noun-like tree, based on its head noun"""
-    print("N-PHRASE-NUM-BEGIN")
     print("tree: ", tr, " label: ", tr.label(), " subtrees: ", len(tr))
     if (tr.label() == 'N'):           # N -> "Ns" | "Np"
         return tr[0][1]               # the s or p from Ns or Np
     elif (tr.label() == 'Nom'):       # Nom -> AN | AN Rel
-        N_phrase_num(tr[0])
+        print("Inside: " + tr.label())
+        return N_phrase_num(tr[0])
     elif tr.label() == "AN":          # AN -> N | A AN
+        print("Inside: " + tr.label())
         if tr[0].label() == "N":
-            N_phrase_num(tr[0])
+            return N_phrase_num(tr[0])
         else:
-            N_phrase_num(tr[1])
+            return N_phrase_num(tr[1])
     elif tr.label() == "NP":          # NP -> P | AR Nom | Nom
+        print("Inside: " + tr.label())
         if tr[0].label() == "P" or tr[0].label() == "Nom":
-            N_phrase_num(tr[0])
+            return N_phrase_num(tr[0])
         else:
-            N_phrase_num(tr[1])
+            return N_phrase_num(tr[1])
     else:
-        return ""
+        print("hmmm")
+        ##for i in tr:
+          #  print("----")
+           ## print(i.label())
+            #if i.label() == "N" or i.label() == "Nom" or i.label() == "AN" or i.label() == "NP":
+            #    N_phrase_num(i)
+           # print("----")
 
 
 def V_phrase_num(tr):
     """returns the number attribute of a verb-like tree, based on its head verb,
        or '' if this is undetermined."""
     if (tr.label() == 'T' or tr.label() == 'I'):
+        print("Inside: " + tr.label())
         return tr[0][1]  # the s or p from Is,Ts or Ip,Tp
     elif (tr.label() == 'VP'):        # VP    -> I | T NP | BE A | BE NP | VP AND VP
-        if tr[0].label() == "VP":
-            V_phrase_num(tr[0])
-            V_phrase_num(tr[2])
-        else:
-            V_phrase_num(tr[0])
+        print("Inside: " + tr.label())
+        return V_phrase_num(tr[0])
     elif (tr.label() == 'BE' or tr.label() == 'DO'):        # BE    -> "BEs" | "BEp"      # DO    -> "DOs" | "DOp"
+        print("Inside: " + tr.label())
         return tr[0][2]
     elif (tr.label() == 'Rel'):       # Rel   -> WHO VP | NP T
-        V_phrase_num(tr[1])
+        print("Inside: " + tr.label())
+        return V_phrase_num(tr[1])
     elif (tr.label() == 'QP'):        # QP    -> VP | DO NP T
-        if tr[0].label() == "VP":
-            V_phrase_num(tr[0])
-        else:
-            V_phrase_num(tr[2])
+        print("Inside: " + tr.label())
+        return V_phrase_num(tr[0])
     else:
-        return ""
+        return "hmm"
     #    S      -> WHO QP[y] QM | WHICH Nom[y] QP[y] QM
     #    QP[x]  -> VP[x] | DO[y] NP[y] T[p]
     #    VP[x]  -> I[x] | T[x] NP | BE[x] A | BE[x] NP[x] | VP[x] AND VP[x]
@@ -180,33 +186,70 @@ def matches(n1, n2):
 
 
 def check_node(tr):
+    print("======CHECK_NODE=====")
     """checks agreement constraints at the root of tr"""
     rule = top_level_rule(tr)
     if (rule == 'S -> WHICH Nom QP QM'):
+        print("Inside:    ", rule)
         return (matches(N_phrase_num(tr[1]), V_phrase_num(tr[2])))
-    elif rule == 'QP -> VP | DO NP T':
-        if tr[0].label() == "DO":
-            return matches(N_phrase_num(tr[1]), V_phrase_num(tr[2])) # does
-        else:
-            return True
-    elif rule == 'VP -> I | T NP | BE A | BE NP | VP AND VP':
-        if tr[0].label() == "VP":
-            return matches(V_phrase_num(tr[0]), V_phrase_num(tr[2]))
-        elif len(tr) == 2:
-            if tr[1].label() == "NP":
-                return matches(V_phrase_num(tr[0]), N_phrase_num(tr[1]))
-        else:
-            return True
-    elif rule == 'NP -> P | AR Nom | Nom':
+    elif rule == 'QP -> VP':
+        print("Inside:    ", rule)
+        return check_node(tr[0])
+    elif rule == 'QP -> DO NP T':
+        print("Inside:    ", rule)
+        return (matches(V_phrase_num(tr[0]), N_phrase_num(tr[1])) and matches(V_phrase_num(tr[1]), N_phrase_num(tr[2])))
+    elif rule == 'VP -> I':
+        print("Inside:    ", rule)
         return True
-    elif rule == 'Nom -> AN | AN Rel':
+    elif rule == 'VP -> T NP':
+        print("Inside:    ", rule)
+        print('---------------')
+        #print(tag_word())
+        print("*******N*******")
+        print(N_phrase_num(tr[1]))
+        print("****************")
+        print("++++++++++++++++")
+        print("*******V*******")
+        print(N_phrase_num(tr[1]))
+        print("****************")
+
+        print('---------------')
+        return (matches(V_phrase_num(tr[0]), N_phrase_num(tr[1])))
+    elif rule == 'VP -> BE A':
+        print("Inside:    ", rule)
+        return True
+    elif rule == 'VP -> BE NP':
+        print("Inside:    ", rule)
+        return (matches(V_phrase_num(tr[0]), N_phrase_num(tr[1])))
+    elif rule == 'VP -> VP AND VP':
+        print("Inside:    ", rule)
+        return (matches(V_phrase_num(tr[0]), V_phrase_num(tr[2])))
+    elif rule == 'NP -> P' or rule == 'NP -> Nom':
+        print("Inside:    ", rule)
+        return True
+    elif rule == 'NP -> AR Nom ':
+        print("Inside:    ", rule)
+        return (matches(N_phrase_num(tr[0]), N_phrase_num(tr[0])))
+    elif rule == 'Nom -> AN':
+        print("Inside:    ", rule)
+        return True
+    elif rule == 'Nom -> AN Rel':
+        print("Inside:    ", rule)
         return matches(N_phrase_num(tr[0]), V_phrase_num[1])
-    elif rule == 'AN -> N | A AN':
-        return matches()
-    elif rule == 'Rel -> WHO VP | NP T':
-        if tr[0].label() == "NP":
-            return matches(N_phrase_num(tr[0]), V_phrase_num(tr[1]))
+    elif rule == 'AN -> N':
+        print("Inside:    ", rule)
+        return True
+    elif rule == 'AN -> A AN':
+        print("Inside:    ", rule)
+        return True
+    elif rule == 'Rel -> WHO VP':
+        print("Inside:    ", rule)
+        return True
+    elif rule == 'Rel -> NP T':
+        print("Inside:    ", rule)
+        return matches(N_phrase_num(tr[0]), V_phrase_num(tr[1]))
     else:
+        print("hmm")
         return ""
 
 
@@ -284,24 +327,39 @@ if __name__ == "__main__":
     #allp = all_parses(["Which", "orange", "duck", "likes", "a", "frog", "?"], lx)
     #allp = [Tree('S', [Tree('WHICH', ['WHICH']), Tree('Nom', [Tree('AN', [Tree('A', ['A']), Tree('AN', [Tree('N', ['Np'])])])]), Tree('QP', [Tree('VP', [Tree('T', ['Ts']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Ns'])])])])])]), Tree('QM', ['?'])])]
 
-    allp = all_parses(["Who", "is", "a", "duck", "?"], lx) #w
+    #allp = all_parses(["Which", "orange", "duck", "likes", "a", "frog", "?"], lx) #w
     #allp = all_parses(["John", "is", "a", "duck"], lx)        #dw
     #allp = all_parses(["Which", "orange", "duck", "likes", "a", "frog", "?"], lx)
     #allp = all_parses(["Who", "does", "John", "like", "?"], lx)
-    print("-------------")
-    print(allp)
-    print("-------------")
-   # print(allp[0])
-    print("-------------")
+
+    # testtree is the tree for "Which orange duck likes a frog?"
+    print("=======================================")
+
+    tt = Tree('S', [Tree('WHICH', ['WHICH']), Tree('Nom', [Tree('AN', [Tree('A', ['A']), Tree('AN', [Tree('N', ['Ns'])])])]), Tree('QP', [Tree('VP', [Tree('T', ['Ts']), Tree('NP', [Tree('AR', ['AR']), Tree('Nom', [Tree('AN', [Tree('N', ['Ns'])])])])])]), Tree('QM', ['?'])])
+
+
+    #print(check_node(tt[2]))
+    print(tt[2])
+    print(check_node(tt[2]))
+    #print(N_phrase_num(tt[2]))
+    #print(N_phrase_num(tt[2][1]))
+    #print(N_phrase_num(tt[1]))
+    #check_all_nodes(tt)
+
+    print("=======================================")
+    #print(allp)
+    #print("-------------")
+    #print(allp[0])
+    #print("-------------")
     #print(allp[0][1])
-    print("-------------")
+    #print("-------------")
     #print("allp[0]:       ", allp[0])
     #print("allp[0][0]:    ", allp[0][0], " label: ", allp[0][0].label())
     #print("allp[0][0]:    ", allp[0][1], " label: ", allp[0][1].label())
     #print("allp[0][0]:    ", allp[0][2], " label: ", allp[0][2].label())
-    print("################################################")
-    print("################################################")
-    print("################################################")
+    #print("################################################")
+    #print("################################################")
+    #print("################################################")
     #print(N_phrase_num(allp[0][1]))
 
     """
