@@ -79,7 +79,7 @@ def sem(tr):
 
     elif rule == "S -> WHO QP QM":
         print("Inside: " + rule)
-        return '(\\x.(' + sem(tr[1]) + '))'
+        return '(' + sem(tr[1]) + ')'
     elif rule == "S -> WHICH Nom QP QM":
         return sem(tr[1]) + ' & ' + sem(tr[2])
 
@@ -90,7 +90,7 @@ def sem(tr):
     elif rule == "QP -> DO NP T":
         # return '(' + sem(tr[1]) + ' & ' + sem(tr[0]) + ')'
         #return '(' + sem(tr[1]) + ' & ' + sem(tr[2]) + ')'
-        return '(exists y.(' + sem(tr[1]) + '(y) & ' + sem(tr[2]) + '))'
+        return '(\\x.(exists y.(' + sem(tr[1]) + '(y) & ' + sem(tr[2]) + ')))'
 
 
     elif rule == "VP -> I":
@@ -188,6 +188,7 @@ def model_check (P,bindings,entities,fb):
         if (len(P.args) == 1):
             pred = P.function.__str__()
             arg = interpret_const_or_var(P.args[0].__str__(),bindings,entities)
+            print("THE QUERY TERMS: ", pred, arg)
             return fb.queryUnary(pred,arg)
         else:
             pred = P.function.function.__str__()
@@ -214,6 +215,9 @@ def model_check (P,bindings,entities,fb):
 def find_all_solutions(L, entities, fb):
     v = str(L.variable)
     P = L.term
+    print("We have v: ", v, " and P: ", P)
+    print("Factbase: ", fb, " and entities: ", entities)
+    print("Model check: ", model_check(P, [(v, entities[0])], entities, fb))
     return [e for e in entities if model_check(P, [(v, e)], entities, fb)]
 
 
@@ -249,9 +253,10 @@ def dialogue():
 
                 trees = all_valid_parses(lx, wds)
 
-                output("----------trees----------")
+                output("----------TREES----------")
                 print(trees)
-                output("----------trees----------")
+                print(len(trees))
+                output("----------TREES----------")
 
                 if (len(trees) == 0):
                     output("Eh??" + " 2")
@@ -261,9 +266,11 @@ def dialogue():
                     tr = restore_words(trees[0], wds)
                     lam_exp = lp.parse(sem(tr))
                     L = lam_exp.simplify()
-                    # print L  # useful for debugging
+                    print("Lambda expression: ", L)  # useful for debugging
                     entities = lx.getAll('P')
+                    print("Entities: ", entities)
                     results = find_all_solutions(L, entities, fb)
+                    print("Results: ", results)
                     if (results == []):
                         if (wds[0].lower() == 'who'):
                             output("No one")
@@ -276,11 +283,14 @@ def dialogue():
                         output(buf)
         elif (s[-1] == '.'):
             s = s[:-1]  # tolerate final full stop
+            print("s: " + s,  len(s))
             if len(s) == 0:
                 output("Eh??")
             else:
                 wds = s.split()
+                print(wds)
                 msg = process_statement(lx, wds, fb)
+                print(msg)
                 if (msg == ''):
                     output("OK.")
                 else:
@@ -303,8 +313,8 @@ if __name__ == "__main__":
     #tr = restore_words(tr0[0], ["Who", "is", "a", "duck", "?"])
 
     # "Who does John like?" (works)
-    tr0 = [Tree('S', [Tree('WHO', ['WHO']), Tree('QP', [Tree('DO', ['DOs']), Tree('NP', [Tree('P', ['P'])]), Tree('T', ['Tp'])]), Tree('QM', ['?'])])]
-    tr = restore_words(tr0[0], ["Who", "does", "John", "like", "?"])
+    #tr0 = [Tree('S', [Tree('WHO', ['WHO']), Tree('QP', [Tree('DO', ['DOs']), Tree('NP', [Tree('P', ['P'])]), Tree('T', ['Tp'])]), Tree('QM', ['?'])])]
+    #tr = restore_words(tr0[0], ["Who", "does", "John", "like", "?"])
 
 
     # (\x. (exists y.((y=John) & T_like(y,x))))
@@ -316,11 +326,14 @@ if __name__ == "__main__":
     #print("vs", verb_stem("likes"))
     #tr.draw()
     #print(noun_stem("ducks"))
-    exp = sem(tr)
-    #print(exp)
-    A = lp.parse(exp)
-    print(A.simplify())
-    #dialogue()
+
+    # Testing semantics  # |
+    #exp = sem(tr)        # |
+    #A = lp.parse(exp)    # |
+    #print(A.simplify())  # |
+    # ----------------------
+
+    dialogue()
     #print("likes:    ", verb_stem("likes"))
     #print("hates:    ", verb_stem("hates"))
     #print("bathes:    ", verb_stem("bathes"))

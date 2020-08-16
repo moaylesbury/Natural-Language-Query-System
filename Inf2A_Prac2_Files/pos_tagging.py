@@ -87,37 +87,37 @@ def tag_word(lx, wd):
     for i in "PAINT":
         returned = lx.getAll(i)
         #-print(returned, len(returned))
-        # print(returned)
+        print(returned)
         if (len(returned) != 0):
             for j in returned:
-                if j[0] == wd:
-                    if j[0] in unchanging_plurals_list:
-                        tags.append(j[1] + "p")
+                if j == wd:
+                    if j in unchanging_plurals_list:
+                        tags.append(i + "p")
                         print("----unchanging----")
                         print(j)
                         print("----unchanging----")
-                    if j[1] == "N":
+                    if i == "N":
                         print(j)
                         print("Noun stem: ", noun_stem(wd))
                         if noun_stem(wd) == "":
-                            tags.append(j[1] + "s")
+                            tags.append(i + "s")
                             print("SINGULAR")
                             #if j[0] in unchanging_plurals_list:
                                 #tags.append(j[1] + "s")
                         else:
-                            tags.append(j[1] + "p")
+                            tags.append(i + "p")
                             print("PLURAL")
-                    if j[1] in "IT":
+                    if i in "IT":
                         print("in IT")
                         if verb_stem(wd) == "":
                             print("plurals")
-                            tags.append(j[1] + "p")
+                            tags.append(i + "p")
                             print("PLURAL")
                         else:
-                            tags.append(j[1] + "s")
+                            tags.append(i + "s")
                             print("SINGULAR")
-                    if j[1] in "PA":
-                        tags.append(j[1])
+                    if i in "PA":
+                        tags.append(i)
     return tags
         
 

@@ -27,12 +27,13 @@ class Lexicon:
         self.lb = []   # LexBase
 
     def add(self, stem, cat):
-        if (cat in "PAINT"):
-            add(self.lb, [stem, cat])
+        #if (cat in "PAINT"):
+        print("LEX ADDITION: ", stem, cat)
+        add(self.lb, [stem, cat])
 
     def getAll(self, cat):
-        if (cat in "PAINT"):
-            return [f for f in self.lb if f[1] == cat]
+        #if (cat in "PAINT"):
+        return [f[0] for f in self.lb if f[1] == cat]
 
 
 class FactBase:
@@ -42,15 +43,20 @@ class FactBase:
         self.fb = []   # FactBase
 
     def addUnary(self, pred, e1):
+        print("UNARY   ", pred, e1)
         add(self.fb, [pred, e1])
 
     def addBinary(self, pred, e1, e2):
+        print("BINARY  ", pred, e1, e2)
         add(self.fb, [pred, e1, e2])
 
     def queryUnary(self, pred, e1):
+        print("query unary", pred, e1)
+        print([pred, e1] in self.fb)
         return True if ([pred, e1] in self.fb) else False
 
     def queryBinary(self, pred, e1, e2):
+        print("query binary")
         return True if ([pred, e1, e2] in self.fb) else False
 
 
@@ -106,8 +112,6 @@ def verb_stem(s):
     else:
         # verb stem tagged VB and 3s form VBZ
         for m in brown.tagged_words():
-            if m[0] == "fizz":
-                print(m)
             if m[0] == s:
                 if m[1] == "VBZ":
                     stags += 1
@@ -144,6 +148,7 @@ def process_statement(lx, wlist, fb):
     #   AR -> a | an
     # We parse this in an ad hoc way.
     msg = add_proper_name(wlist[0], lx)
+    print("msg: " + msg)
     if (msg == ''):
         if (wlist[1] == 'is'):
             if (wlist[2] in ['a', 'an']):
@@ -169,7 +174,14 @@ def process_statement(lx, wlist, fb):
 
 # Testing
 
-#if __name__ == "__main__":
+if __name__ == "__main__":
+    lx = Lexicon()
+    lx.add("Michael", "P")
+    lx.add("duck", "N")
+    fb = FactBase()
+    fb.addUnary("duck", "Michael")
+    fb.queryUnary("duck", "Michael")
+    print(lx.getAll("P"))
     #print("========Testing========")
     #words = ["eats", "tells", "shows", "pays", "buys", "flies", "tries", "unifies", "dies", "lies", "ties", "goes", "boxes", "attaches", "washes", "dresses", "fizzes", "loses", "dazes", "lapses", "analyses", "has", "likes", "hates", "bathes"]
     #correct = ["eat", "tell", "show", "pay", "buy", "fly", "try", "unify", "die", "lie", "tie", "go", "box", "attach", "wash", "dress", "fizz", "lose", "daze", "lapse", "analyse", "have", "like", "hate", "bathe"]
